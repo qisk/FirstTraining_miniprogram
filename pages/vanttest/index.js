@@ -22,7 +22,7 @@ Page({
     template code -- */
   },
 
-  // 每次增加20，刷新环形进度条
+  // 每次增加10，循环刷新环形进度条
   incressProgress(e) {
     this.data.stopcircle = false
 
@@ -65,7 +65,7 @@ Page({
     this.setData({ province: e.detail.values[0].name })
     this.setData({ city: e.detail.values[1].name })
     this.setData({ area: e.detail.values[2].name })
-    this.onClose()
+    this.onClose() 
   },
 
   onLoad: function () {
