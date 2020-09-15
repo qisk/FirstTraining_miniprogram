@@ -1,0 +1,45 @@
+<!--index.wxml-->
+<view class="container">
+  <!--
+  <view class="userinfo">
+    <button wx:if="{{!hasUserInfo && canIUse}}" open-type="getUserInfo" bindgetuserinfo="getUserInfo"> 获取头像昵称 </button>
+    <block wx:else>
+      <image bindtap="bindViewTap" class="userinfo-avatar" src="{{userInfo.avatarUrl}}" mode="cover"></image>
+      <text class="userinfo-nickname">{{userInfo.nickName}}</text>
+    </block>
+  </view>
+  -->
+<text>First Traning - vant components test</text>
+
+<view class="gap">地区选择器：</view>
+<van-button bindtap="onTap" type="primary">弹出</van-button>
+<view class="blank"></view>
+<view class="flex-wrp" style="flex-direction:row;justify-content:flex-start">
+  <text>省：</text>
+  <text>{{province}}  </text>
+  <text>市：</text>
+  <text>{{city}}  </text>
+  <text>地区：</text>
+  <text>{{area}}  </text>
+</view>
+
+<view class="gap">环形进度条：</view>
+<van-button bindtap="incressProgress" type="primary">start progress</van-button>
+<view class="blank"></view>
+
+<van-circle
+  value="{{progress}}"
+  text="{{progress}}%"
+  size="120"
+/>
+
+<van-popup position="bottom" show="{{ show }}" bind:close="onClose">
+<van-area
+  area-list="{{ areaList }}"
+  columns-placeholder="{{ ['请选择', '请选择', '请选择'] }}"
+  title="标题" bind:confirm="onAreaConfirm"
+/>
+</van-popup>
+
+
+</view>
