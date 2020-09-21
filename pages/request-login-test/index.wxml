@@ -1,0 +1,15 @@
+<!--pages/request-login-test/index.wxml-->
+<text>pages/request-login-test/index.wxml</text>
+
+<view class="page-section">
+	<text class="page-section-title">3.7 接口调用融合登陆</text>
+	<view class="btn-area">
+		<button bindtap="exec_request_without_login" type="primary">不支持自动弹出登陆框</button>
+    <button bindtap="exec_request_with_login" type="primary">支持自动弹出登陆框</button>
+    <button bindtap="exec_request_with_login_callback" type="primary">支持请求回调</button>
+    <button bindtap="execwxreqeust" type="primary">不支持cookie：调用wxp.request</button>
+    <button bindtap="execwxrequestWithCookie" type="primary">支持cookie：调用wx.    requestWithCookie</button>
+<view style="height:20px;"></view>
+<LoginPanel show="{{showLoginPanel}}"></LoginPanel>
+	</view>
+</view>
