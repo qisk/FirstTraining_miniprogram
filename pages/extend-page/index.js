@@ -8,6 +8,12 @@ Page({
 
   },
 
+  // 调用扩展page对象的方法
+  async extendpagetest(e) {
+      console.log("extend page prop extend_showLoginPanel:" + this.data.extend_showLoginPanel + ",  extend_name:" + this.data.extend_name)
+      this.hi('weapp')
+  },
+
   /**
    * 生命周期函数--监听页面加载
    */

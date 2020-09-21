@@ -1,4 +1,5 @@
 //app.js
+require("./lib/extend-page")
 import "./lib/any"
 import wxp from './lib/wxp'
 import Event from './lib/event'

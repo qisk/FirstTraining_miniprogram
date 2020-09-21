@@ -1,2 +1,6 @@
-<!--pages/extend-page/index.wxml-->
-<text>pages/extend-page/index.wxml</text>
+<view class="container">
+<text>实现扩展Pages对象</text>
+<view class="btn-area">
+		<button bindtap="extendpagetest" type="primary">extendpage测试</button>
+</view>
+</view>
