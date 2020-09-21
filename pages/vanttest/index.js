@@ -65,7 +65,7 @@ Page({
     this.setData({ province: e.detail.values[0].name })
     this.setData({ city: e.detail.values[1].name })
     this.setData({ area: e.detail.values[2].name })
-    this.onClose() 
+    this.onClose()
   },
 
   onLoad: function () {
