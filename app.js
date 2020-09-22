@@ -14,6 +14,7 @@ App({
   },
 
   onLaunch: function () {
+    /*
     // 展示本地存储能力
     var logs = wx.getStorageSync('logs') || []
     logs.unshift(Date.now())
@@ -45,6 +46,7 @@ App({
         }
       }
     })
+    */
   },
 
   // 用来计算可用屏幕的高度
