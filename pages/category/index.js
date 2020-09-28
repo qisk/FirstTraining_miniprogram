@@ -5,6 +5,7 @@ Page({
     vtabs: [],
     activeTab: 0,
     showLoginPanel:false,
+    goodsListMap:{},
   },
 
   async onLoad() {
@@ -25,8 +26,27 @@ Page({
     //   '家居建材', '计生情趣', '医药保健', 
     //   '时尚钟表', '珠宝饰品', '礼品鲜花', 
     //   '图书音像', '房产', '电脑办公']
-    const vtabs = categoriesData.map(item => ({title: item.category_name, id: item.id}))
+    
+    /*
+    // 这种方式，会造成vtabs跳转位置不对，详见 http://localhost:88/web/#/page/edit/70/1717
+    const vtabs = categoriesData.map(item => {
+      this.getGoodsListByCategory(item.id)
+      return ({title: item.category_name, id: item.id})
+    })
+
     this.setData({vtabs})
+    */
+   
+   let vtabs = []
+    for(let j=0;j<categoriesData.length;j++){
+      let item = categoriesData[j]
+      await this.getGoodsListByCategory(item.id)
+      vtabs.push({title: item.category_name, id: item.id})
+    }
+    this.setData({vtabs})
+    
+    this.setData({test:111})
+    console.log("this.data.test:", this.data.test)
   },
 
   onTabCLick(e) {
@@ -37,6 +57,25 @@ Page({
   onChange(e) {
     const index = e.detail.index
     console.log('change', index)
-  }
+  },
 
+  async getGoodsListByCategory(categoryId){
+    let goodsData = await wxp.request_with_login({
+      url: `http://localhost:3000/goods/goods?page_index=1&page_size=20&category_id=${categoryId}`,
+    })
+    if (goodsData){
+      goodsData = goodsData.data.data.rows;
+    }
+    
+    console.log("before setData categoryId=", categoryId , "," ,this.data.goodsListMap[categoryId]);
+    
+    this.setData({
+      [`goodsListMap[${categoryId}]`]:goodsData
+    })
+    
+    console.log("after setData categoryId=", categoryId , "," ,this.data.goodsListMap[categoryId]);
+
+    // qisk：这一句可以去掉，setData会自动更新
+    //this.data.goodsListMap[categoryId] = goodsData
+  }
 })
