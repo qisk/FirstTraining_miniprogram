@@ -9,6 +9,8 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@miniprogram-component-plus/vtabs": "^1.0.0",
+    "@miniprogram-component-plus/vtabs-content": "^1.0.0",
     "@vant/weapp": "^1.5.0",
     "miniprogram-api-promise": "^1.0.4",
     "weapp-cookie": "^1.4.6"

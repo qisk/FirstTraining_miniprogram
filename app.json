@@ -1,5 +1,6 @@
 {
   "pages": [
+    "pages/category/index",
     "pages/vant-test/index",
     "pages/logs/logs",
     "pages/request-login-test/index",
@@ -14,28 +15,5 @@
   "sitemapLocation": "sitemap.json",
   "useExtendedLib": {
     "weui": true
-  },
-  "tabBar": {
-    "custom":true,
-    "list": [
-      {
-        "pagePath": "pages/vant-test/index",
-        "iconPath": "custom-tab-bar/tab-bar/component.png",
-        "selectedIconPath": "custom-tab-bar/tab-bar/component-on.png",
-        "text": "首页"
-      },
-      {
-        "pagePath": "pages/extend-page/index",
-        "iconPath": "custom-tab-bar/tab-bar/component.png",
-        "selectedIconPath": "custom-tab-bar/tab-bar/component-on.png",
-        "text": "第二页"
-      },
-      {
-        "pagePath": "pages/request-login-test/index",
-        "iconPath": "custom-tab-bar/tab-bar/component.png",
-        "selectedIconPath": "custom-tab-bar/tab-bar/component-on.png",
-        "text": "第三页"
-      }
-    ]
   }
 }
