@@ -190,9 +190,12 @@ Component({
             var length = this.data.vtabs.length;
             var scrollTop = e.detail.scrollTop;
             var index = 0;
-            if (scrollTop >= _heightRecords[0]) {
+
+            // 在计算时加入屏幕的高度，解决新分类区进入屏幕时，没有自动加载新的商品数据的问题
+            const windowHeight = wx.getSystemInfoSync().windowHeight
+            if (scrollTop >= _heightRecords[0] - windowHeight) {
                 for (var i = 1; i < length; i++) {
-                    if (scrollTop >= _heightRecords[i - 1] && scrollTop < _heightRecords[i]) {
+                    if (scrollTop >= (_heightRecords[i - 1] - windowHeight) && scrollTop < (_heightRecords[i] - windowHeight)) {
                         index = i;
                         break;
                     }
