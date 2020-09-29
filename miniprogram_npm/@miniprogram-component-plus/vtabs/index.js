@@ -122,21 +122,12 @@ Component({
             this.scrollTabBar(_activeTab);
         }
     },
+
     relations: {
         '../vtabs-content/index': {
             type: 'child',
             linked: function linked(target) {
-                var _this = this;
-
-                target.calcHeight(function (rect) {
-                    _this.data._contentHeight[target.data.tabIndex] = rect.height;
-                    if (_this._calcHeightTimer) {
-                        clearTimeout(_this._calcHeightTimer);
-                    }
-                    _this._calcHeightTimer = setTimeout(function () {
-                        _this.calcHeight();
-                    }, 100);
-                });
+                this.calcChildHeight(target)
             },
             unlinked: function unlinked(target) {
                 delete this.data._contentHeight[target.data.tabIndex];
@@ -147,6 +138,24 @@ Component({
         attached: function attached() {}
     },
     methods: {
+        hello: function hello(a) {
+            return a + 1
+        },
+        
+        calcChildHeight: function calcChildHeight(target) {
+            var _this = this;
+
+            target.calcHeight(function (rect) {
+                _this.data._contentHeight[target.data.tabIndex] = rect.height;
+                if (_this._calcHeightTimer) {
+                    clearTimeout(_this._calcHeightTimer);
+                }
+                _this._calcHeightTimer = setTimeout(function () {
+                    _this.calcHeight();
+                }, 100);
+            });
+        },
+
         calcHeight: function calcHeight() {
             var length = this.data.vtabs.length;
             var _contentHeight = this.data._contentHeight;

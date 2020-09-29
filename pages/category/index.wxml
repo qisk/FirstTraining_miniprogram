@@ -1,12 +1,12 @@
 <mp-vtabs 
   vtabs="{{vtabs}}" 
   activeTab="{{activeTab}}" 
-  bindtabclick="onTabCLick"
+  bindtabclick="onTabClick"
   bindchange="onChange"
-  class="test"
+  class="test" id="category-vtabs"
 >
   <block wx:for="{{vtabs}}" wx:key="title" >
-    <mp-vtabs-content tabIndex="{{index}}">
+    <mp-vtabs-content id="goods-content{{index}}" tabIndex="{{index}}">
       <view class="vtabs-content-item">
         <view>{{test}}:我是第{{index + 1}}项： {{item.title}}，{{item.id}}</view>
         <view wx:for="{{goodsListMap[item.id]}}" wx:for-index="index2" wx:for-item="item2" wx:key="id">
