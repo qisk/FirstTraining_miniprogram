@@ -9,7 +9,7 @@
   "window": {
     "backgroundTextStyle": "light",
     "navigationBarBackgroundColor": "#fff",
-    "navigationBarTitleText": "Weixin",
+    "navigationBarTitleText": "商城项目实战",
     "navigationBarTextStyle": "black"
   },
   "sitemapLocation": "sitemap.json",

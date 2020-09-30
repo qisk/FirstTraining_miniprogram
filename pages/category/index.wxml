@@ -3,7 +3,7 @@
   activeTab="{{activeTab}}" 
   bindtabclick="onTabClick"
   bindchange="onChange"
-  class="test" id="category-vtabs"
+  class="test" id="category-vtabs" bindscrolltoindexlower="onScrollToIndexLower"
 >
   <block wx:for="{{vtabs}}" wx:key="title" >
     <mp-vtabs-content id="goods-content{{index}}" tabIndex="{{index}}">
@@ -16,7 +16,7 @@
         </view>
         -->
 
-        <view wx:for="{{goodsListMap[item.id]}}" wx:for-index="index2" wx:for-item="item2" wx:key="id">
+        <view wx:for="{{goodsListMap[item.id].rows}}" wx:for-index="index2" wx:for-item="item2" wx:key="id">
           <van-card
             price="{{item2.start_price}}"
             title="{{item2.goods_name}}"

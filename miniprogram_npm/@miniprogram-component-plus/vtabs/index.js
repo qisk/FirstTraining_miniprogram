@@ -92,7 +92,6 @@ module.exports =
 
 "use strict";
 
-
 Component({
     options: {
         addGlobalClass: true,
@@ -189,6 +188,7 @@ Component({
             if (_heightRecords.length === 0) return;
             var length = this.data.vtabs.length;
             var scrollTop = e.detail.scrollTop;
+            /* 这是4.17的实现，会出现滑倒列表底部，自动跳到顶部第一个分类的问题
             var index = 0;
 
             // 在计算时加入屏幕的高度，解决新分类区进入屏幕时，没有自动加载新的商品数据的问题
@@ -202,6 +202,39 @@ Component({
                 }
             }
             if (index !== this.data.activeTab) {
+                this.triggerEvent('change', { index: index });
+                this.setData({ activeTab: index });
+            }
+            */
+           
+            // 设置index为-1，解决滑倒列表底部，自动跳到顶部第一个分类的问题
+            // 只有index被设置了新的值，才会触发change事件。
+            var index = -1;
+            
+            const windowHeight = wx.getSystemInfoSync().windowHeight;
+            // 距离当前已加载记录底部还有150个像素时，发送scrolltoindexlower事件，再次发送请求进行加载，以实现分类加载功能
+            if (scrollTop >= _heightRecords[this.data.activeTab]-windowHeight-150){
+                // 滚动到底部还有150个px时
+                console.log("index:", index, ", scrollTop:", scrollTop, ", _heightRecords[this.data.activeTab]-windowHeight-150:", _heightRecords[this.data.activeTab]-windowHeight-150);
+
+                // 每次滑倒记录底部，会触发多次scrolltoindexlower事件
+                // 要想标示出是同一次滑倒底部事件，就需要多传入一个_heightRecords[this.data.activeTab]。
+                // 这个_heightRecords[this.data.activeTab]在同一次滑倒记录底部时，值是一样的；但如果加载了新的数据，这个值就会发生变化。
+                // 使用_heightRecords，可以在同一个类别index中，触发多次页面加载。
+                this.triggerEvent('scrolltoindexlower', { index: this.data.activeTab, _heightRecords: _heightRecords[this.data.activeTab]});
+            }
+            
+            if (scrollTop >= _heightRecords[0]-windowHeight) {
+                for (var i = 1; i < length; i++) {
+                    if (scrollTop >= _heightRecords[i - 1]-windowHeight && scrollTop < (_heightRecords[i]-windowHeight)) {
+                        index = i;
+                        break;
+                    }
+                }
+            }else{
+                index = 0
+            }
+            if (index > -1 && index !== this.data.activeTab) {
                 this.triggerEvent('change', { index: index });
                 this.setData({ activeTab: index });
             }

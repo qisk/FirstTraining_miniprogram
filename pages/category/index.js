@@ -6,6 +6,8 @@ Page({
     activeTab: 0,
     showLoginPanel: false,
     goodsListMap: {},
+    lastIndexForLoadMore:-1, // 记录当前左边类别的索引位置
+    _heightRecords:-1, // 记录当前的记录的总高度，过滤重复的scrolltoindexlower事件
   },
 
   async onLoad() {
@@ -66,8 +68,26 @@ Page({
   onCategoryChanged(index){
     let cate = this.data.vtabs[index]
     let categoryId = cate.id
+    // 如果该类比为空，才调用getGoodsListByCategory进行加载
     if (!this.data.goodsListMap[categoryId]){
       this.getGoodsListByCategory(categoryId,index)
+    }
+  },
+
+  onScrollToIndexLower(e){
+    console.log("scroll to index lower",e.detail, "lastIndexForLoadMore:", this.data.lastIndexForLoadMore)
+    let index = e.detail.index
+    let _heightRecords = e.detail._heightRecords
+    // 这是一个多发事件
+    // 判断当前类别索引是否改变，如果改变则重新获取商品信息
+    // 如果这样写，只能动态加载一次，当第二次滑倒内容边缘时，index和lastIndexForLoadMore均未被改变，就无法触发再次加载。
+    if ( (index != this.data.lastIndexForLoadMore) || (_heightRecords != this.data._heightRecords)) {
+      console.log("************** exec getGoodsListByCategory *************")
+      let cate = this.data.vtabs[index]
+      let categoryId = cate.id
+      this.getGoodsListByCategory(categoryId,index, true)
+      this.data.lastIndexForLoadMore = index
+      this.data._heightRecords = _heightRecords 
     }
   },
 
@@ -82,6 +102,7 @@ Page({
     //console.log("categoryVtabs.hello:", categoryVtabs.hello(100))
   },
 
+  /* 4.17实现：根据类别获取商品列表，未实现分类加载，仅加载第一页的前20跳数据
   async getGoodsListByCategory(categoryId, index) {
     let goodsData = await wxp.request_with_login({
       url: `http://192.168.31.115:3000/goods/goods?page_index=1&page_size=20&category_id=${categoryId}`,
@@ -102,6 +123,74 @@ Page({
     //this.data.goodsListMap[categoryId] = goodsData
 
     // 重新计算右侧的高度
+    this.reClacChildHeight(index)
+  }
+  */
+
+  // 实现分类加载
+  // categoryId：类别id
+  // index：类别在vtabs左侧的索引值
+  // loadNextPage：是否需要加载下一页（默认不加载）
+  async getGoodsListByCategory(categoryId, index, loadNextPage = false) {
+    console.log(categoryId, index, loadNextPage);
+
+    const pageSize = 5
+    let pageIndex = 1
+
+    // 将当前加载的商品数据，赋值给listMap
+    let listMap = this.data.goodsListMap[categoryId]
+    console.log("init listMap:", listMap);
+
+    if (listMap) {
+      console.log(listMap.count);
+
+      // 加载完了，就不要重复加载了
+      // listMap通过服务端接口获取，指的是每个类别的商品总数量
+      if (listMap.rows.length >= listMap.count) {
+        console.log("*********** all data load completly! ***********")
+        return
+      }
+      if (listMap.pageIndex) {
+        pageIndex = listMap.pageIndex
+        // 如果loadNextPage为false，仅加载当前页面的数据，
+        // 目前的代码场景，走到这里loadNextPage都是true，不会是false
+        if (loadNextPage) {
+          pageIndex++
+        } else {
+          console.log("******** process loadNextPage==false, index:", pageIndex);
+        }
+      }
+    }
+    let goodsData = await wxp.request_with_login({
+      url: `http://192.168.31.115:3000/goods/goods?page_index=${pageIndex}&page_size=${pageSize}&category_id=${categoryId}`,
+    })
+    if (goodsData) {
+      goodsData = goodsData.data.data;
+    }
+    console.log(categoryId, index, loadNextPage, goodsData, goodsData.count);
+    if (listMap) {
+      listMap.pageIndex = pageIndex
+      listMap.count = goodsData.count
+      listMap.rows.push(...goodsData.rows)
+      console.log("get response data listMap:", listMap);
+
+      // 这里扩展了goodsListMap，加入了如下内容：
+      // goodsListMap[${categoryId}].pageIndex:当前已加载的商品pageIndex
+      // goodsListMap[${categoryId}].count:当前类别的商品总数量；
+      // goodsListMap[${categoryId}].rows:当前已加载的商品数据。
+      this.setData({
+        [`goodsListMap[${categoryId}]`]: listMap
+      })
+    } else {
+      // 当第一次加载该类别数据时，还没有listMap，直接将数据赋给goodsListMap
+      console.log("listMap is null");
+      goodsData.pageIndex = pageIndex
+      this.setData({
+        [`goodsListMap[${categoryId}]`]: goodsData
+      })
+    }
+
+    // this.data.goodsListMap[categoryId] = goodsData
     this.reClacChildHeight(index)
   }
 })
