@@ -54,7 +54,7 @@ Component({
         console.log("code",code);
         
         let res = await getApp().wxp.request_without_login({
-          url: 'http://localhost:3000/user/wexin-login2',
+          url: 'http://192.168.31.115:3000/user/wexin-login2',
           method: 'POST',
           header: {
             'content-type': 'application/json',

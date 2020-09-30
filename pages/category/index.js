@@ -10,7 +10,7 @@ Page({
 
   async onLoad() {
     let categoriesData = await wxp.request_with_login({
-      url: 'http://localhost:3000/goods/categories',
+      url: 'http://192.168.31.115:3000/goods/categories',
     })
     if (categoriesData) {
       // 注意，拿到categories要用两个data才能拿到
@@ -84,7 +84,7 @@ Page({
 
   async getGoodsListByCategory(categoryId, index) {
     let goodsData = await wxp.request_with_login({
-      url: `http://localhost:3000/goods/goods?page_index=1&page_size=20&category_id=${categoryId}`,
+      url: `http://192.168.31.115:3000/goods/goods?page_index=1&page_size=20&category_id=${categoryId}`,
     })
     if (goodsData) {
       goodsData = goodsData.data.data.rows;
