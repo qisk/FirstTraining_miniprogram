@@ -8,49 +8,61 @@ Page({
     goodsListMap: {},
     lastIndexForLoadMore:-1, // 记录当前左边类别的索引位置
     _heightRecords:-1, // 记录当前的记录的总高度，过滤重复的scrolltoindexlower事件
+    loading: true, // 开启骨架屏标示
   },
 
-  async onLoad() {
-    let categoriesData = await wxp.request_with_login({
-      url: 'http://192.168.31.115:3000/goods/categories',
-    })
-    if (categoriesData) {
-      // 注意，拿到categories要用两个data才能拿到
-      categoriesData = categoriesData.data.data;
-    }
-    console.log(categoriesData);
-
-    // const titles = ['热搜推荐', '手机数码', '家用电器',
-    //   '生鲜果蔬', '酒水饮料', '生活美食', 
-    //   '美妆护肤', '个护清洁', '女装内衣', 
-    //   '男装内衣', '鞋靴箱包', '运动户外', 
-    //   '生活充值', '母婴童装', '玩具乐器', 
-    //   '家居建材', '计生情趣', '医药保健', 
-    //   '时尚钟表', '珠宝饰品', '礼品鲜花', 
-    //   '图书音像', '房产', '电脑办公']
-
-    /*
-    // 这种方式，会造成vtabs跳转位置不对，详见 http://localhost:88/web/#/page/edit/70/1717
-    const vtabs = categoriesData.map(item => {
-      this.getGoodsListByCategory(item.id)
-      return ({title: item.category_name, id: item.id})
+  onLoad() {
+    wx.showLoading({
+      title: '加载中...',
     })
 
-    this.setData({vtabs})
-    */
-
-    let vtabs = []
-    for (let j = 0; j < categoriesData.length; j++) {
-      let item = categoriesData[j]
-      // 仅加载前三个类别的商品
-      if (j<3) this.getGoodsListByCategory(item.id, j)
-      // await this.getGoodsListByCategory(item.id)
-      vtabs.push({ title: item.category_name, id: item.id })
-    } 
-    this.setData({ vtabs })
-
-    this.setData({ test: 111 })
-    console.log("this.data.test:", this.data.test)
+    let that = this
+    setTimeout(async function(){
+      let categoriesData = await wxp.request_with_login({
+        url: 'http://192.168.31.115:3000/goods/categories',
+      })
+      if (categoriesData) {
+        // 注意，拿到categories要用两个data才能拿到
+        categoriesData = categoriesData.data.data;
+      }
+      console.log(categoriesData);
+  
+      // const titles = ['热搜推荐', '手机数码', '家用电器',
+      //   '生鲜果蔬', '酒水饮料', '生活美食', 
+      //   '美妆护肤', '个护清洁', '女装内衣', 
+      //   '男装内衣', '鞋靴箱包', '运动户外', 
+      //   '生活充值', '母婴童装', '玩具乐器', 
+      //   '家居建材', '计生情趣', '医药保健', 
+      //   '时尚钟表', '珠宝饰品', '礼品鲜花', 
+      //   '图书音像', '房产', '电脑办公']
+  
+      /*
+      // 这种方式，会造成vtabs跳转位置不对，详见 http://localhost:88/web/#/page/edit/70/1717
+      const vtabs = categoriesData.map(item => {
+        this.getGoodsListByCategory(item.id)
+        return ({title: item.category_name, id: item.id})
+      })
+  
+      this.setData({vtabs})
+      */
+  
+      let vtabs = []
+      for (let j = 0; j < categoriesData.length; j++) {
+        let item = categoriesData[j]
+        // 仅加载前三个类别的商品
+        if (j<3) that.getGoodsListByCategory(item.id, j)
+        // await this.getGoodsListByCategory(item.id)
+        vtabs.push({ title: item.category_name, id: item.id })
+      } 
+      that.setData({ 
+        vtabs,
+        loading: false 
+      })
+      wx.hideLoading()
+  
+      that.setData({ test: 111 })
+      console.log("this.data.test:", that.data.test)  
+    }, 2000)
   },
 
   onTabClick(e) {
