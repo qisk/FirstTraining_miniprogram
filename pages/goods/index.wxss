@@ -1,1 +1,9 @@
 /* pages/goods/index.wxss */
+
+.van-tag {
+  margin-left: 10px;
+}
+
+.van-popup{
+  background-color: #efefef;
+}

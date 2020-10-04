@@ -8,6 +8,7 @@ Page({
     goodsId:0,
     goodsData:{}, // res.data是一个json字符串，所以用{}定义
     goodsImages: [], // goodsImages是一个数组，所以用[]定义
+    showSkuPanel: false, // 商品规格选择面板
     goodsContentInfo:{},
   },
 
@@ -32,6 +33,16 @@ Page({
         goodsContentInfo
       })
     })
+  },
+
+
+  showSkuPanelPopup() {
+    this.setData({showSkuPanel:true})
+  },
+
+
+  onCloseSkuPanel() {
+    this.setData({showSkuPanel:false})
   },
 
   /**
