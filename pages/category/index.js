@@ -1,4 +1,5 @@
 const { default: wxp } = require("../../lib/wxp")
+const util = require("../../utils/util.js")
 
 Page({
   data: {
@@ -19,7 +20,7 @@ Page({
     let that = this
     setTimeout(async function(){
       let categoriesData = await wxp.request_with_login({
-        url: 'http://192.168.31.115:3000/goods/categories',
+        url: util.ipAddress + `/goods/categories`,
       })
       if (categoriesData) {
         // 注意，拿到categories要用两个data才能拿到
@@ -174,7 +175,7 @@ Page({
       }
     }
     let goodsData = await wxp.request_with_login({
-      url: `http://192.168.31.115:3000/goods/goods?page_index=${pageIndex}&page_size=${pageSize}&category_id=${categoryId}`,
+      url: util.ipAddress + `/goods/goods?page_index=${pageIndex}&page_size=${pageSize}&category_id=${categoryId}`,
     })
     if (goodsData) {
       goodsData = goodsData.data.data;
@@ -204,5 +205,34 @@ Page({
 
     // this.data.goodsListMap[categoryId] = goodsData
     this.reClacChildHeight(index)
-  }
+  },
+
+  async onTapGoods(e){
+    wx.showLoading({
+      title: 'Loading..',
+    })
+
+    // 通过在wxml中定义data-id进行回传
+    let goodsId = e.currentTarget.dataset.id 
+    let goods = await wx.wxp.request({
+      url: `http://localhost:3000/goods/goods/${goodsId}`,
+    })
+    console.log(goods, goodsId);
+    
+    if (goods){
+      goods = goods.data.data
+      // 页面跳转时，传递goodsId参数
+      wx.navigateTo({
+        url: `/pages/goods/index?goodsId=${goodsId}`,
+        // 通过navigateTo回调函数，拿到evnetChannel的对象，并派发事件，传递商品详情数据
+        // EventChannel对象无法直接实例化，只能通过两种方法获取eventChannel对象：
+        //（1）OnLoad函数中，通过this.getOpenerEventChannel()获取；
+        //（2）在路由函数（如wx.navigatgeTo）的success回调函数中，通过res输入参数获取。
+        success: function(res) {
+          res.eventChannel.emit('goodsData', { data: goods })
+        }
+      })
+    }
+    wx.hideLoading()
+  },
 })

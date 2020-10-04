@@ -14,6 +14,10 @@ const formatNumber = n => {
   return n[1] ? n : '0' + n
 }
 
+//const ipAddress = "http://localhost:3000"
+const ipAddress = "http://192.168.31.115:3000"
+
 module.exports = {
-  formatTime: formatTime
+  formatTime: formatTime,
+  ipAddress: ipAddress
 }

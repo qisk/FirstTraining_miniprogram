@@ -1,0 +1,28 @@
+<!--pages/goods/index.wxml-->
+<swiper indicator-dots style="height:300px;">
+	<block wx:for="{{goodsImages}}" wx:key="*this">
+		<swiper-item>
+			<van-image lazy-load slot="loading" fit="cover" width="100%" height="300" src="{{item.content}}" />
+		</swiper-item>
+	</block>
+</swiper>
+
+<view>
+  <view>¥{{goodsData.start_price}}</view>
+  <van-row>
+    <van-col span="16">
+      <view>{{goodsData.goods_name}}</view></van-col>
+    <van-col span="8">
+      <van-button icon="star-o">分享</van-button>
+    </van-col>
+  </van-row>
+  <view>{{goodsData.goods_desc}}</view>
+</view>
+
+<van-cell-group>
+  <van-cell title="全程护航，请放心购买" is-link />
+</van-cell-group>
+
+
+
+

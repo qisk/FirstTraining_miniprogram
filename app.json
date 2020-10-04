@@ -4,7 +4,8 @@
     "pages/vant-test/index",
     "pages/logs/logs",
     "pages/request-login-test/index",
-    "pages/extend-page/index"
+    "pages/extend-page/index",
+    "pages/goods/index"
   ],
   "window": {
     "backgroundTextStyle": "light",
