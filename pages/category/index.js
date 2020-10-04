@@ -215,7 +215,7 @@ Page({
     // 通过在wxml中定义data-id进行回传
     let goodsId = e.currentTarget.dataset.id 
     let goods = await wx.wxp.request({
-      url: `http://localhost:3000/goods/goods/${goodsId}`,
+      url: util.ipAddress + `/goods/goods/${goodsId}`,
     })
     console.log(goods, goodsId);
     
