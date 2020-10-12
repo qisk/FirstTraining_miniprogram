@@ -131,6 +131,33 @@ Page({
      })
   },
 
+  async addToCart(e) {
+    if (!this.data.selectedGoodsSkuObject.sku) {
+      wx.showModal({
+        title: '请选择商品规格',
+        showCancel: false
+      })
+      return
+    }
+    let goods_id = this.data.goodsId
+    let goods_sku_id = this.data.selectedGoodsSkuObject.sku.id
+    let data = {
+      goods_id,
+      goods_sku_id
+    }
+
+    let res = await wxp.request_with_login({
+      url: util.ipAddress + `/user/my/carts/`,
+      method: 'post',
+      data
+    })
+    if (res.data.msg == 'ok') {
+      wx.showToast({
+        title: '已添加',
+      })
+    }
+  },
+
   /**
    * 生命周期函数--监听页面初次渲染完成
    */
