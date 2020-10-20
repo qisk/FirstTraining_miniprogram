@@ -1,12 +1,13 @@
 {
   "pages": [
-    "pages/category/index",
     "pages/cart/index",
+    "pages/category/index",
     "pages/vant-test/index",
     "pages/logs/logs",
     "pages/request-login-test/index",
     "pages/extend-page/index",
-    "pages/goods/index"
+    "pages/goods/index",
+    "pages/map"
   ],
   "window": {
     "backgroundTextStyle": "light",

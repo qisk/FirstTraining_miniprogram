@@ -19,7 +19,7 @@
         </view>
         -->
 
-        <view wx:for="{{goodsListMap[item.id].rows}}" wx:for-index="index2" wx:for-item="item2" wx:key="id">
+        <view class="goods-item" wx:for="{{goodsListMap[item.id].rows}}" wx:for-index="index2" wx:for-item="item2" wx:key="id">
           <van-card
             bindtap="onTapGoods" data-id="{{item2.id}}"
             price="{{item2.start_price}}"

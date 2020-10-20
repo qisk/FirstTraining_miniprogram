@@ -1,39 +1,27 @@
 <!--pages/cart/index.wxml-->
 <van-cell-group>
   <van-cell title="购物车" value="" label="" border="{{ false }}">
-    <van-button bindtap="changeEditMode" slot="right-icon" plain type="info" size="mini">{{editMode?'完成':'编辑'}}</van-button>
+    <van-button bindtap="changeEditMode" slot="right-icon" plain type="info" size="mini">{{editMode?'完成':'编辑'}}
+    </van-button>
   </van-cell>
 </van-cell-group>
 
 <van-checkbox-group value="{{ cartIdSelectedResult }}" bind:change="onSelectGoodsItem">
-  <view style="display:flex;">
-    <view style="width:50px;display:flex; align-items:center; justify-content:center">
-      <van-checkbox name="1" shape="square"></van-checkbox>
+  <block wx:for="{{carts}}" wx:key="id">
+    <view style="display:flex;">
+      <view style="width:50px;display:flex; align-items:center; justify-content:center">
+        <van-checkbox name="{{item.id}}" shape="square"></van-checkbox>
+      </view>
+      <!-- 支持根据内容自由扩展 -->
+      <view style="flex:1">
+        <van-card price="{{item.price * item.num/100}}元" desc="{{item.goods_sku_desc}}" title="{{item.goods_name}}" thumb="{{item.goods_image}}">
+          <view slot="footer">
+            <van-stepper data-num="{{item.num}}" data-id="{{item.id}}" bind:change="onCartGoodsNumChanged" value="{{item.num}}" step="1" />
+          </view>
+        </van-card>
+      </view>
     </view>
-    <!-- 支持根据内容自由扩展 -->
-    <view style="flex:1">
-      <van-card price="10.00" desc="描述信息" title="商品标题" thumb="{{ imageURL }}">
-        <view slot="footer">
-          <van-stepper value="1" step="1" />
-        </view>
-      </van-card>
-    </view>
-  </view>
-
-  <view style="display:flex;">
-    <view style="width:50px;display:flex; align-items:center; justify-content:center">
-      <van-checkbox name="2" shape="square"></van-checkbox>
-    </view>
-    <!-- 支持根据内容自由扩展 -->>
-    <view style="flex:1">
-      <van-card price="10.00" desc="描述信息" title="商品标题" thumb="{{ imageURL }}">
-        <view slot="footer">
-          <van-stepper value="1" step="1" />
-        </view>
-      </van-card>
-    </view>
-  </view>
-
+  </block>
 </van-checkbox-group>
 
 <van-submit-bar wx:if="{{ !editMode }}" price="{{ 3050 }}" button-text="提交订单">

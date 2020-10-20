@@ -1,4 +1,7 @@
 // pages/cart/index.js
+const { default: wxp } = require("../../lib/wxp")
+const util = require("../../utils/util.js")
+
 Page({
 
   /**
@@ -7,7 +10,8 @@ Page({
   data: {
     cartIdSelectedResult:[],
     allIsSelected:false,
-    editMode:false
+    editMode:false,
+    carts:[],
   },
 
   onSelectGoodsItem(e) {
@@ -42,11 +46,42 @@ Page({
     })
   },
 
+  async onCartGoodsNumChanged(e) {
+    let cartGoodsId = e.currentTarget.dataset.id
+    // 自定义数据中的num，是修改之前的数据
+    let oldNum = parseInt(e.currentTarget.dataset.num)
+    console.log('e.detail', typeof e.detail, cartGoodsId, oldNum)
+    // e.detail是修改之后的数据，已经是数值类型，只有e.currentTarget.dataset中传递的自定义类型都是字符串，有可能需要转类型
+    let num = e.detail
+    let data = {num}
+
+    let res = await wxp.request_with_login({
+      url: util.ipAddress + `/user/my/carts/${cartGoodsId}`,
+      method: 'put',
+      data
+    })
+
+    if (res.data.msg == 'ok') {
+      wx.showToast({
+        title: num > oldNum ? '增加成功' : '减少成功',
+      })
+    }
+  },
+
   /**
    * 生命周期函数--监听页面加载
    */
-  onLoad: function (options) {
-
+  onLoad: async function (options) {
+    // 拉取购物车数据
+    let res = await wxp.request_with_login({
+      url: util.ipAddress + `/user/my/cart`
+    })
+    if (res.data.msg == "ok") {
+      let carts = res.data.data
+      this.setData({
+        carts
+      })
+    }
   },
 
   /**
