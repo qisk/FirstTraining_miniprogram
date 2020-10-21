@@ -1,3 +1,6 @@
+const { default: wxp } = require("../../lib/wxp")
+const util = require("../../utils/util.js")
+
 Page({
   data: {
     // 是否正在定位 true:正在定位 false:结束定位
@@ -36,7 +39,7 @@ Page({
     })
 
     // 从storage中读取站点数据（正向），设置到markers中
-    let srcVal = JSON.parse(wx.getStorageSync('stations_positive_info'))
+    let srcVal = JSON.parse(wx.getStorageSync('stations_opposite_info'))
     if (srcVal) {
       let station_info = []
       for(var i = 0; i < srcVal.length; i++){
@@ -50,10 +53,25 @@ Page({
           station_info.push(temp)
         }
       }
+      /*
+      // 测试：将中心点加入到markers中
+      var temp = {
+        id : station_info.length,
+        latitude: this.data.latitude,
+        longitude: this.data.longitude,
+        title : '中心点',
+      };
+      station_info.push(temp)
+      */
       console.log("station_info:", station_info)
       this.setData({
         markers: station_info
       })  
+    }
+
+    for(var i = 0; i < this.data.markers.length; i++) {
+      const distance = util.getMapDistance(this.data.markers[i].latitude, this.data.markers[i].longitude, this.data.latitude, this.data.longitude)
+      console.log(`the center point distance markers ${i}`, distance)
     }
   },
 
@@ -76,7 +94,11 @@ Page({
       var that = this;
       //将计时器赋值给setInter
       this.data.setInter = setInterval(function () {
-        that.mapCtx.moveToLocation()
+        that.mapCtx.moveToLocation({
+          success(res) {
+            console.log('res:', res)
+          }
+        })
         console.log('setInterval==', '等待2s后再执行')
       }, 2000)
       this.setData({ btnText: '结束定位'})
@@ -89,6 +111,26 @@ Page({
       })
       this.setData({ btnText: '开始定位'})
     }
+  },
+
+  // 计算当前点到站点的距离
+  calDistanceToStation: function () {
+    wx.getLocation({
+      type: 'gcj02',
+      isHighAccuracy: true,
+      success (res) {
+        // 获取当前的经纬度
+        const latitude = String(res.latitude)
+        const longitude = String(res.longitude)
+        const speed = res.speed
+        const accuracy = res.accuracy
+
+        console.log(res, latitude, longitude, speed, accuracy)
+
+        // 计算和各个站点的距离，小于10米就将markers设置为绿色，将下个站点设置为蓝色
+        // 
+      }
+    })
   },
 
   // 获取地图中心点位置
