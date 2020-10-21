@@ -1,3 +1,6 @@
+const { default: wxp } = require("../../lib/wxp")
+const util = require("../../utils/util.js")
+
 Page({
   data: {
     // 是否正在定位 true:正在定位 false:结束定位
@@ -8,56 +11,10 @@ Page({
     direction_name: '万达广场方向',
 
     stations: [],
-    stations_positive_direction: [{
-        id: 0,
-        name: '仙岳花园',
-        latitude: '23.099994',
-        longitude: '113.324520'
-      }, {
-        id: 1,
-        name: '福德堡小区',
-        latitude: '23.099994',
-        longitude: '113.304520'
-      },
-      {
-        id: 2,
-        name: '白果山',
-        latitude: '23.10229',
-        longitude: '113.3345211'
-      },{
-        id: 3,
-        name: '中医院',
-        latitude: '23.10229',
-        longitude: '113.3345211'
-      }
-    ],
-
-    stations_opposite_direction: [{
-      id: 0,
-      name: '泓爱医院',
-      latitude: '23.099994',
-      longitude: '113.324520'
-    }, {
-      id: 1,
-      name: '湖边',
-      latitude: '23.099994',
-      longitude: '113.304520'
-    },
-    {
-      id: 2,
-      name: '金山',
-      latitude: '23.10229',
-      longitude: '113.3345211'
-    },{
-      id: 3,
-      name: '金山小学',
-      latitude: '23.10229',
-      longitude: '113.3345211'
-    }],
 
     // 指定中心点坐标
-    latitude: 23.099994,
-    longitude: 113.324520,
+    latitude: 24.4955238,
+    longitude: 118.1180946,
     
     // 指定标记点，目前指向中心位置
     markers: [{
@@ -92,9 +49,27 @@ Page({
   // 在页面onReady函数中创建地图对象
   onReady: function (e) {
     this.mapCtx = wx.createMapContext('myMap')
-    this.setData({
-      stations: this.data.stations_positive_direction
-    })
+    
+    // 从storage中获取站点数据，如果获取不到，则从Util中获取初始数据
+    try {
+      var value = wx.getStorageSync('stations_positive_info')
+      if (value) {
+        this.setData({
+          stations: JSON.parse(value)
+        })
+      } else {
+        console.log(util.stations_positive_info)
+        this.setData({
+          stations: util.stations_positive_info
+        })
+        wx.setStorage({
+          key:"stations_positive_info",
+          data:`${JSON.stringify(util.stations_positive_info)}`
+        }) 
+      }
+    } catch (e) {
+      console.log('wx.getStorageSync fail:', e)
+    }
   },
 
  /**
@@ -139,7 +114,11 @@ Page({
     // 获取当前位置的经纬度，更新stations_positive_direction或stations_opposite_direction数组中对应id的经纬度信息，并将数据存入storage中
 
     var that = this;
+    // 默认的type=wgs84，是真实的gps坐标，这个坐标值放到地图中，会出现位置偏移；
+    // 需要使用type=gcj02，获取的坐标放到地图中，才不会出现位置偏移
+    // gcj02坐标系是由中国国家测绘局制订的地理信息系统的坐标系统。由WGS84坐标系经加密后的坐标系，也称火星坐标系，谷歌中国地图、搜搜中国地图、高德地图采用的是GCJ02地理坐标系。
     wx.getLocation({
+      type: 'gcj02',
       isHighAccuracy: true,
       success (res) {
         const latitude = String(res.latitude)
@@ -148,38 +127,77 @@ Page({
         const accuracy = res.accuracy
 
         console.log(res, latitude, longitude, speed, accuracy)
-        if (that.data.direction_checked) {
-          // 更新stations_positive_direction数组元素
-          that.setData({
-            [`stations_positive_direction[${stationId}].latitude`]: latitude,
-            [`stations_positive_direction[${stationId}].longitude`]: longitude,
-            [`stations[${stationId}].latitude`]: latitude,
-            [`stations[${stationId}].longitude`]: longitude,
-          })
-          // 将新的stations_positive_direction存入storage
-          wx.setStorage({
-            key:"stations_positive_direction",
-            data:`${JSON.stringify(that.data.stations_positive_direction)}`
-          }) 
+        
+        // 更新站点数据
+        that.setData({
+          [`stations[${stationId}].latitude`]: latitude,
+          [`stations[${stationId}].longitude`]: longitude,
+        })
+        
+        // 更新storage中的数据
+        let updateKey = 'stations_positive_info'
+        if (that.data.direction_checked == false) {
+          updateKey = 'stations_opposite_info'
         }
+          
+        // 将新的stations存入storage
+        wx.setStorage({
+          key: `${updateKey}`,
+          data: `${JSON.stringify(that.data.stations)}`
+        })
       }
      })
   },
 
+  // 点击方向复选框的处理函数
   onChange(event) {
     console.log(event.detail)
     if (event.detail) {
-      this.setData({
-        direction_checked: event.detail,
-        direction_name: '万达广场方向',
-        stations: this.data.stations_positive_direction
-      })
+      try {
+        var value = wx.getStorageSync('stations_positive_info')
+        if (value) {
+          this.setData({
+            direction_checked: event.detail,
+            direction_name: '万达广场方向',
+            stations: JSON.parse(value)
+          })
+        } else {
+          this.setData({
+            direction_checked: event.detail,
+            direction_name: '万达广场方向',
+            stations: util.stations_positive_info
+          })
+          wx.setStorage({
+            key:"stations_positive_info",
+            data:`${JSON.stringify(util.stations_positive_info)}`
+          }) 
+        }
+      } catch (e) {
+        console.log('wx.getStorageSync fail:', e)
+      }
     } else {
-      this.setData({
-        direction_checked: event.detail,
-        direction_name: '岳阳小区方向',
-        stations: this.data.stations_opposite_direction
-      })
+      try {
+        var value = wx.getStorageSync('stations_opposite_info')
+        if (value) {
+          this.setData({
+            direction_checked: event.detail,
+            direction_name: '岳阳小区方向',
+            stations: JSON.parse(value)
+          })
+        } else {
+          this.setData({
+            direction_checked: event.detail,
+            direction_name: '岳阳小区方向',
+            stations: util.stations_opposite_info
+          })
+          wx.setStorage({
+            key:"stations_opposite_info",
+            data:`${JSON.stringify(util.stations_opposite_info)}`
+          }) 
+        }
+      } catch (e) {
+        console.log('wx.getStorageSync fail:', e)
+      }
     }
   },
 

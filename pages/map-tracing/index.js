@@ -6,28 +6,14 @@ Page({
     btnText: '开始定位',
 
     // 指定中心点坐标
-    latitude: 23.099994,
-    longitude: 113.324520,
+    latitude: 24.4955238,
+    longitude: 118.1180946,
     
     // 指定标记点，目前指向中心位置
-    markers: [{
-      id: 1,
-      latitude: 23.099994,
-      longitude: 113.324520,
-      title: '标记点1'
-    }, {
-      id: 2,
-      latitude: 23.099994,
-      longitude: 113.304520,
-      title: '标记点2'
-    }, {
-      id: 3,
-      latitude: 23.10229,
-      longitude: 113.3345211,
-      title: '标记点3'
-    }],
+    markers: [],
     
     // covers已废弃
+    /*
     covers: [{
       latitude: 23.099994,
       longitude: 113.344520,
@@ -37,11 +23,38 @@ Page({
       longitude: 113.304520,
       iconPath: 'location.png'
     }]
+    */
   },
 
   // 在页面onReady函数中创建地图对象
   onReady: function (e) {
     this.mapCtx = wx.createMapContext('myMap')
+
+    this.mapCtx.moveToLocation({
+      latitude: this.data.latitude, 
+      longitude: this.data.longitude
+    })
+
+    // 从storage中读取站点数据（正向），设置到markers中
+    let srcVal = JSON.parse(wx.getStorageSync('stations_positive_info'))
+    if (srcVal) {
+      let station_info = []
+      for(var i = 0; i < srcVal.length; i++){
+        var temp = {
+          id : srcVal[i].id,
+          latitude: srcVal[i].latitude,
+          longitude: srcVal[i].longitude,
+          title : srcVal[i].name,
+        };
+        if (srcVal[i].latitude && srcVal[i].longitude) {
+          station_info.push(temp)
+        }
+      }
+      console.log("station_info:", station_info)
+      this.setData({
+        markers: station_info
+      })  
+    }
   },
 
   /**
@@ -71,8 +84,8 @@ Page({
       this.data.locationFlg = false
       clearInterval(this.data.setInter)
       this.mapCtx.moveToLocation({
-        latitude: 23.099994, 
-        longitude: 113.324520
+        latitude: this.data.latitude, 
+        longitude: this.data.longitude,
       })
       this.setData({ btnText: '开始定位'})
     }
@@ -113,16 +126,7 @@ Page({
   includePoints: function() {
     this.mapCtx.includePoints({
       padding: [50],
-      points: [{
-        latitude: 23.099994,
-        longitude: 113.324520,
-      }, {
-        latitude: 23.099994,
-        longitude: 113.304520,
-      }, {
-        latitude:23.10229,
-        longitude:113.3345211,
-      }]
+      points: this.data.markers
     })
   }
 })
