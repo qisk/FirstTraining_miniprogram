@@ -9,23 +9,23 @@ Page({
 
     stations: [],
     stations_positive_direction: [{
-        id: 1,
+        id: 0,
         name: '仙岳花园',
         latitude: '23.099994',
         longitude: '113.324520'
       }, {
-        id: 2,
+        id: 1,
         name: '福德堡小区',
         latitude: '23.099994',
         longitude: '113.304520'
       },
       {
-        id: 3,
+        id: 2,
         name: '白果山',
         latitude: '23.10229',
         longitude: '113.3345211'
       },{
-        id: 4,
+        id: 3,
         name: '中医院',
         latitude: '23.10229',
         longitude: '113.3345211'
@@ -33,23 +33,23 @@ Page({
     ],
 
     stations_opposite_direction: [{
-      id: 100,
+      id: 0,
       name: '泓爱医院',
       latitude: '23.099994',
       longitude: '113.324520'
     }, {
-      id: 101,
+      id: 1,
       name: '湖边',
       latitude: '23.099994',
       longitude: '113.304520'
     },
     {
-      id: 102,
+      id: 2,
       name: '金山',
       latitude: '23.10229',
       longitude: '113.3345211'
     },{
-      id: 103,
+      id: 3,
       name: '金山小学',
       latitude: '23.10229',
       longitude: '113.3345211'
@@ -132,8 +132,38 @@ Page({
   },
 
   setStationCoordinate: function (e) {
-    let stationId = e.currentTarget.dataset.id
-    console.log('stationId:', stationId)
+    // 这里需要转成Int，否则setData时会报
+    // Only digits (0-9) can be put inside [] in the path string: stations_positive_direction[0 ].latitude
+    let stationId = parseInt(e.currentTarget.dataset.id)
+    console.log('stationId:', stationId, e.currentTarget.dataset.id)
+    // 获取当前位置的经纬度，更新stations_positive_direction或stations_opposite_direction数组中对应id的经纬度信息，并将数据存入storage中
+
+    var that = this;
+    wx.getLocation({
+      isHighAccuracy: true,
+      success (res) {
+        const latitude = String(res.latitude)
+        const longitude = String(res.longitude)
+        const speed = res.speed
+        const accuracy = res.accuracy
+
+        console.log(res, latitude, longitude, speed, accuracy)
+        if (that.data.direction_checked) {
+          // 更新stations_positive_direction数组元素
+          that.setData({
+            [`stations_positive_direction[${stationId}].latitude`]: latitude,
+            [`stations_positive_direction[${stationId}].longitude`]: longitude,
+            [`stations[${stationId}].latitude`]: latitude,
+            [`stations[${stationId}].longitude`]: longitude,
+          })
+          // 将新的stations_positive_direction存入storage
+          wx.setStorage({
+            key:"stations_positive_direction",
+            data:`${JSON.stringify(that.data.stations_positive_direction)}`
+          }) 
+        }
+      }
+     })
   },
 
   onChange(event) {
