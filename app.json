@@ -1,5 +1,6 @@
 {
   "pages": [
+    "pages/map-setting/index",
     "pages/cart/index",
     "pages/category/index",
     "pages/vant-test/index",
@@ -7,7 +8,7 @@
     "pages/request-login-test/index",
     "pages/extend-page/index",
     "pages/goods/index",
-    "pages/map"
+    "pages/map-tracing/index"
   ],
   "window": {
     "backgroundTextStyle": "light",
@@ -18,5 +19,34 @@
   "sitemapLocation": "sitemap.json",
   "useExtendedLib": {
     "weui": true
+  },
+  "permission": {
+    "scope.userLocation": {
+      "desc": "你的位置信息将用于定位效果展示"
+    }
+  },
+
+  "tabBar": {
+    "custom":true,
+    "list": [
+      {
+        "pagePath": "pages/map-setting/index",
+        "iconPath": "custom-tab-bar/tab-bar/component.png",
+        "selectedIconPath": "custom-tab-bar/tab-bar/component-on.png",
+        "text": "首页"
+      },
+      {
+        "pagePath": "pages/map-tracing/index",
+        "iconPath": "custom-tab-bar/tab-bar/component.png",
+        "selectedIconPath": "custom-tab-bar/tab-bar/component-on.png",
+        "text": "第二页"
+      },
+      {
+        "pagePath": "pages/request-login-test/index",
+        "iconPath": "custom-tab-bar/tab-bar/component.png",
+        "selectedIconPath": "custom-tab-bar/tab-bar/component-on.png",
+        "text": "第三页"
+      }
+    ]
   }
 }

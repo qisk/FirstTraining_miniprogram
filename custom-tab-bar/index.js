@@ -4,14 +4,14 @@ Component({
     color: "#7A7E83",
     selectedColor: "#3cc51f",
     list: [{
-      pagePath: "/pages/vant-test/index",
+      pagePath: "/pages/map-setting/index",
       iconPath: "/custom-tab-bar/tab-bar/component.png",
       selectedIconPath: "/custom-tab-bar//tab-bar/component-on.png",
-      text: "vant",
+      text: "",
       iconClass: "icon-homefill",
       iconTopClass: ""
     }, {
-      pagePath: "/pages/extend-page/index",
+      pagePath: "/pages/map-tracing/index",
       iconPath: "/custom-tab-bar/tab-bar/component.png",
       selectedIconPath: "/custom-tab-bar/tab-bar/component-on.png",
       text: "index",
