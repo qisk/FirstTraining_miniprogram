@@ -2,11 +2,26 @@ const { default: wxp } = require("../../lib/wxp")
 const util = require("../../utils/util.js")
 
 Page({
-  data: {
-    // 是否正在定位 true:正在定位 false:结束定位
-    setInter: 0,
+  data: {   
+    // 是否正在报站 true:正在报站 false:结束报站
     locationFlg: false,
-    btnText: '开始定位',
+    // 报站定时器
+    setInter: 0,
+    // 报站按钮文本（“开始报站”，“结束报站”）
+    btnText: '开始报站',
+
+    // 到达站点id
+    arrive_station_id: -1,
+    arrive_station_name: '',
+    // 下一个站点id
+    next_station_id: -1,
+    next_station_name: '',
+    next_station_distance: 0,
+
+    // 班车方向标示
+    direction_checked: true,
+    // 班车方向名称
+    direction_name: '万达广场方向',
 
     // 指定中心点坐标
     latitude: 24.4955238,
@@ -38,37 +53,10 @@ Page({
       longitude: this.data.longitude
     })
 
-    // 从storage中读取站点数据（正向），设置到markers中
-    let srcVal = JSON.parse(wx.getStorageSync('stations_opposite_info'))
-    if (srcVal) {
-      let station_info = []
-      for(var i = 0; i < srcVal.length; i++){
-        var temp = {
-          id : srcVal[i].id,
-          latitude: srcVal[i].latitude,
-          longitude: srcVal[i].longitude,
-          title : srcVal[i].name,
-        };
-        if (srcVal[i].latitude && srcVal[i].longitude) {
-          station_info.push(temp)
-        }
-      }
-      /*
-      // 测试：将中心点加入到markers中
-      var temp = {
-        id : station_info.length,
-        latitude: this.data.latitude,
-        longitude: this.data.longitude,
-        title : '中心点',
-      };
-      station_info.push(temp)
-      */
-      console.log("station_info:", station_info)
-      this.setData({
-        markers: station_info
-      })  
-    }
+    // 初始化标记站点（正向）
+    this.setMarkers(true)
 
+    // 计算中心点距离标记站点的位置
     for(var i = 0; i < this.data.markers.length; i++) {
       const distance = util.getMapDistance(this.data.markers[i].latitude, this.data.markers[i].longitude, this.data.latitude, this.data.longitude)
       console.log(`the center point distance markers ${i}`, distance)
@@ -91,30 +79,54 @@ Page({
     console.log('exec startStopLocation', this.data.locationFlg)
     if (this.data.locationFlg == false) {
       this.data.locationFlg = true
+
+      this.setData({
+        arrive_station_id: 0,
+        next_station_id: 1,
+        arrive_station_name: this.data.markers[0].title,
+        next_station_name: this.data.markers[1].title,
+      })
+
       var that = this;
-      //将计时器赋值给setInter
+      // 将计时器赋值给setInter
       this.data.setInter = setInterval(function () {
+        // 地图中心跟随当前的位置移动
         that.mapCtx.moveToLocation({
           success(res) {
             console.log('res:', res)
           }
         })
+
+        // 计算是否到站
+        that.calDistanceToStation(that)
+        
+        // 打印下一次执行信息
         console.log('setInterval==', '等待2s后再执行')
       }, 2000)
-      this.setData({ btnText: '结束定位'})
+      this.setData({ btnText: '结束报站'})
     } else {
       this.data.locationFlg = false
+      // 恢复初始值
+      this.setData({
+        arrive_station_id: -1,
+        next_station_id: -1,
+        arrive_station_name: '',
+        next_station_name: '',
+        next_station_distance: 0
+      })
+
       clearInterval(this.data.setInter)
       this.mapCtx.moveToLocation({
         latitude: this.data.latitude, 
         longitude: this.data.longitude,
       })
-      this.setData({ btnText: '开始定位'})
+      this.setData({ btnText: '开始报站'})
     }
   },
-
-  // 计算当前点到站点的距离
-  calDistanceToStation: function () {
+  
+  // 计算当前点到站点的距离，改变站点的markers颜色
+  calDistanceToStation: function() {
+    var that = this;
     wx.getLocation({
       type: 'gcj02',
       isHighAccuracy: true,
@@ -126,10 +138,100 @@ Page({
         const accuracy = res.accuracy
 
         console.log(res, latitude, longitude, speed, accuracy)
+        console.log(that.data.arrive_station_id, that.data.arrive_station_name, that.data.next_station_id, that.data.next_station_name)
 
-        // 计算和各个站点的距离，小于10米就将markers设置为绿色，将下个站点设置为蓝色
-        // 
+        // 如果未到终点站，则计算是否到达下一个站点，以及距离下一个站点还有多远
+        if (that.data.next_station_id != -1) {
+          const distance = util.getMapDistance(that.data.markers[that.data.next_station_id].latitude, that.data.markers[that.data.next_station_id].longitude, latitude, longitude)
+          
+          console.log('distance:', distance)
+
+          let updateNextStationFlg = false
+
+          // 如果距离下一站点的距离小于到站范围，则判断为已到站，更新到达站点及下一个站点
+          if (distance < util.arrive_distance) {
+            let arrive_station_id = that.data.next_station_id
+            
+            let next_station_id = -1
+            // 如果是最后一个站点，设置next_station_id为-1，否则累加
+            if (that.data.next_station_id < that.data.markers.length) {
+              next_station_id = that.data.next_station_id + 1
+            }
+            // 获取下一个站点的名称
+            let next_station_title = (next_station_id == -1)? '无' : that.data.markers[next_station_id].title
+
+            console.log("已到站:", arrive_station_id, markers[arrive_station_id].title, next_station_id, next_station_title)
+
+            that.setData({
+              arrive_station_id: arrive_station_id,
+              arrive_station_name: that.data.markers[arrive_station_id].title,
+              next_station_id: next_station_id,
+              arrive_station_name: next_station_title
+            })
+            updateNextStationFlg = true
+          }
+
+          if (updateNextStationFlg) {
+            // 更新了下一个站点索引，因此要重新计算到下一个站点的距离
+            const distance_new = util.getMapDistance(that.data.markers[that.data.next_station_id].latitude, that.data.markers[that.data.next_station_id].longitude, latitude, longitude)
+
+            that.setData({
+              next_station_distance: distance_new,
+            })
+          } else {
+            // 直接使用上面计算过的距离，更新页面
+            that.setData({
+              next_station_distance: distance,
+            })
+          }
+        }
       }
+    })
+  },
+
+  // 点击方向复选框的处理函数
+  onChange(event) {
+    console.log(event.detail)
+    if (event.detail) {
+      this.setData({
+        direction_checked: event.detail,
+        direction_name: '万达广场方向',
+      })
+    } else {
+      this.setData({
+        direction_checked: event.detail,
+        direction_name: '岳阳小区方向',
+      })
+    }
+    this.setMarkers(event.detail)
+  },
+
+  setMarkers: function(direction_checked) {
+    let srcVal
+    let station_info = []
+    if (direction_checked) {
+      // 从storage中读取站点数据（正向)
+      srcVal = JSON.parse(wx.getStorageSync('stations_positive_info'))
+    } else {
+      // 从storage中读取站点数据（反向）
+      srcVal = JSON.parse(wx.getStorageSync('stations_opposite_info'))
+    }
+    if (srcVal) {
+      for (var i = 0; i < srcVal.length; i++) {
+        var temp = {
+          id: srcVal[i].id,
+          latitude: srcVal[i].latitude,
+          longitude: srcVal[i].longitude,
+          title: srcVal[i].name,
+        };
+        if (srcVal[i].latitude && srcVal[i].longitude) {
+          station_info.push(temp)
+        }
+      }
+    }
+    console.log("station_info:", station_info)
+    this.setData({
+      markers: station_info
     })
   },
 

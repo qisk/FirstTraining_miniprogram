@@ -90,11 +90,14 @@ const getMapDistance = (lat1, lng1, lat2, lng2) => {
   return s;
 }
 
+// 判断到站的距离（20米）
+const arrive_distance = 20
 
 module.exports = {
   formatTime: formatTime,
   ipAddress: ipAddress,
   stations_positive_info: stations_positive_info,
   stations_opposite_info: stations_opposite_info,
-  getMapDistance: getMapDistance
+  getMapDistance: getMapDistance,
+  arrive_distance: arrive_distance
 }

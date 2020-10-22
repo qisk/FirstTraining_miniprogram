@@ -23,7 +23,7 @@
   <scroll-view scroll-y style="height: 450rpx;">
     <van-row>
       <van-col span="8">
-        <van-checkbox value="{{ direction_checked }}" bind:change="onChange">复选框</van-checkbox>
+        <van-checkbox value="{{ direction_checked }}" bind:change="onChange">正方向</van-checkbox>
       </van-col>
       <van-col span="8"><view>{{direction_name}}</view></van-col>
     </van-row>
