@@ -99,8 +99,8 @@ Page({
       this.data.locationFlg = false
       clearInterval(this.data.setInter)
       this.mapCtx.moveToLocation({
-        latitude: 23.099994, 
-        longitude: 113.324520
+        latitude: this.data.latitude, 
+        longitude: this.data.longitude,
       })
       this.setData({ btnText: '开始定位'})
     }
