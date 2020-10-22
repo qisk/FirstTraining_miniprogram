@@ -10,11 +10,11 @@ Page({
     // 报站按钮文本（“开始报站”，“结束报站”）
     btnText: '开始报站',
 
-    // 到达站点id
+    // 到达站点id：初始值为-1，到达终点时，到达站点id为markers.length - 1
     arrive_station_id: -1,
     arrive_station_name: '',
-    // 下一个站点id
-    next_station_id: -1,
+    // 下一个站点id：初始值为0，到达终点站时，下一个站点id为markers.length
+    next_station_id: 0,
     next_station_name: '',
     next_station_distance: 0,
 
@@ -80,11 +80,12 @@ Page({
     if (this.data.locationFlg == false) {
       this.data.locationFlg = true
 
+      // 初始化到达站点，到达站点索引为-1，下一站点索引为0
       this.setData({
-        arrive_station_id: 0,
-        next_station_id: 1,
-        arrive_station_name: this.data.markers[0].title,
-        next_station_name: this.data.markers[1].title,
+        arrive_station_id: -1,
+        next_station_id: 0,
+        arrive_station_name: '',
+        next_station_name: this.data.markers[0].title,
       })
 
       var that = this;
@@ -141,7 +142,7 @@ Page({
         console.log(that.data.arrive_station_id, that.data.arrive_station_name, that.data.next_station_id, that.data.next_station_name)
 
         // 如果未到终点站，则计算是否到达下一个站点，以及距离下一个站点还有多远
-        if (that.data.next_station_id != -1) {
+        if (that.data.arrive_station_id < that.data.markers.length - 1) {
           const distance = util.getMapDistance(that.data.markers[that.data.next_station_id].latitude, that.data.markers[that.data.next_station_id].longitude, latitude, longitude)
           
           console.log('distance:', distance)
@@ -151,22 +152,18 @@ Page({
           // 如果距离下一站点的距离小于到站范围，则判断为已到站，更新到达站点及下一个站点
           if (distance < util.arrive_distance) {
             let arrive_station_id = that.data.next_station_id
-            
-            let next_station_id = -1
-            // 如果是最后一个站点，设置next_station_id为-1，否则累加
-            if (that.data.next_station_id < that.data.markers.length) {
-              next_station_id = that.data.next_station_id + 1
-            }
-            // 获取下一个站点的名称
-            let next_station_title = (next_station_id == -1)? '无' : that.data.markers[next_station_id].title
+            let next_station_id = that.data.next_station_id + 1
 
-            console.log("已到站:", arrive_station_id, markers[arrive_station_id].title, next_station_id, next_station_title)
+            // 获取下一个站点的名称
+            let next_station_title = (next_station_id >= that.data.markers.length)? '无' : that.data.markers[next_station_id].title
+
+            console.log("已到站:", arrive_station_id, that.data.markers[arrive_station_id].title, next_station_id, next_station_title)
 
             that.setData({
               arrive_station_id: arrive_station_id,
               arrive_station_name: that.data.markers[arrive_station_id].title,
               next_station_id: next_station_id,
-              arrive_station_name: next_station_title
+              next_station_name: next_station_title
             })
             updateNextStationFlg = true
           }
@@ -210,11 +207,21 @@ Page({
     let srcVal
     let station_info = []
     if (direction_checked) {
-      // 从storage中读取站点数据（正向)
-      srcVal = JSON.parse(wx.getStorageSync('stations_positive_info'))
+      // 正向：先从storage中读取，如果获取不到，再读取缺省值
+      var value = wx.getStorageSync('stations_positive_info')
+      if (value) {
+        srcVal = JSON.parse(value)
+      } else {
+        srcVal = util.stations_positive_info
+      }
     } else {
-      // 从storage中读取站点数据（反向）
-      srcVal = JSON.parse(wx.getStorageSync('stations_opposite_info'))
+      // 反向：先从storage中读取，如果获取不到，再读取缺省值
+      var value = wx.getStorageSync('stations_opposite_info')
+      if (value) {
+        srcVal = JSON.parse(value)
+      } else {
+        srcVal = util.stations_opposite_info
+      }    
     }
     if (srcVal) {
       for (var i = 0; i < srcVal.length; i++) {

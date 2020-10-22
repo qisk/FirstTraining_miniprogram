@@ -13,24 +13,24 @@ const formatTime = date => {
  const stations_positive_info = [{
     id: 0,
     name: '仙岳花园',
-    latitude: '24.4986',
-    longitude: '118.112721'
+    latitude: '24.49625623',
+    longitude: '118.11751817'
   }, {
     id: 1,
     name: '福德堡小区',
-    latitude: '24.499405',
-    longitude: '118.112269'
+    latitude: '24.49707709',
+    longitude: '118.11701090'
   },
   {
     id: 2,
     name: '白果山',
-    latitude: '24.49983',
-    longitude: '118.111214'
+    latitude: '24.49847059',
+    longitude: '118.11622395'
   }, {
     id: 3,
     name: '中医院',
-    latitude: '24.500559',
-    longitude: '118.110642'
+    latitude: '24.49822238',
+    longitude: '118.11476345'
   }
 ]
 
