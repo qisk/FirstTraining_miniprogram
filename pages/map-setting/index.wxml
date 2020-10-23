@@ -6,6 +6,7 @@
       latitude="{{latitude}}"
       longitude="{{longitude}}"
       markers="{{markers}}"
+      polyline="{{polyline}}"
       covers="{{covers}}"
       show-location
     ></map>
@@ -26,13 +27,14 @@
         <van-checkbox value="{{ direction_checked }}" bind:change="onChange">正方向</van-checkbox>
       </van-col>
       <van-col span="8"><view>{{direction_name}}</view></van-col>
+      <van-col span="8"><view>{{polyline_point_distance}}</view></van-col>
     </van-row>
     <van-cell-group>
       <block wx:for="{{stations}}" wx:key="id">
         <van-cell value="{{item.latitude}}, {{item.longitude}}" icon="shop-o" is-link>
           <view slot="title">
             <view class="van-cell-text">{{item.name}}</view>
-            <van-button bindtap="setStationCoordinate" type="primary" data-id="{{item.id}} ">设置位置</van-button>
+            <van-button plain bindtap="setStationCoordinate" type="primary" data-id="{{item.id}} ">更新位置</van-button>
           </view>
         </van-cell>
       </block>

@@ -1,5 +1,6 @@
 const { default: wxp } = require("../../lib/wxp")
 const util = require("../../utils/util.js")
+const simulate = require("../../utils/bus-track")
 
 Page({
   data: {   
@@ -170,8 +171,13 @@ Page({
 
           if (updateNextStationFlg) {
             // 更新了下一个站点索引，因此要重新计算到下一个站点的距离
-            const distance_new = util.getMapDistance(that.data.markers[that.data.next_station_id].latitude, that.data.markers[that.data.next_station_id].longitude, latitude, longitude)
-
+            if (that.data.next_station_id < that.data.markers.length) {
+              // 有下一个站点，重新计算到下一个节点的距离
+              const distance_new = util.getMapDistance(that.data.markers[that.data.next_station_id].latitude, that.data.markers[that.data.next_station_id].longitude, latitude, longitude)
+            } else {
+              // 无下一个站点（已达终点站），将距离设置为0
+              const distance_new = 0
+            }
             that.setData({
               next_station_distance: distance_new,
             })
@@ -212,7 +218,7 @@ Page({
       if (value) {
         srcVal = JSON.parse(value)
       } else {
-        srcVal = util.stations_positive_info
+        srcVal = simulate.stations_positive_info
       }
     } else {
       // 反向：先从storage中读取，如果获取不到，再读取缺省值
@@ -220,7 +226,7 @@ Page({
       if (value) {
         srcVal = JSON.parse(value)
       } else {
-        srcVal = util.stations_opposite_info
+        srcVal = simulate.stations_opposite_info
       }    
     }
     if (srcVal) {
