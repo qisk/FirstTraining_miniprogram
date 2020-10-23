@@ -11,15 +11,19 @@
       show-location
     ></map>
   </view>
-  <view class="btn-area">
-    <button bindtap="startStopLocation" class="page-body-button" type="primary">{{ btnText }}</button>
-    <!--
-    <button bindtap="getCenterLocation" class="page-body-button" type="primary">获取位置</button>
-    <button bindtap="moveToLocation" class="page-body-button" type="primary">移动位置</button>
-    <button bindtap="translateMarker" class="page-body-button" type="primary">移动标注</button>
-    <button bindtap="includePoints" class="page-body-button" type="primary">缩放视野展示所有经纬度</button>
-    -->
-  </view>
+
+  <van-cell-group>
+    <van-cell size="large">
+      <van-row>
+        <van-col span="8">
+          <van-button plain disabled="{{demoFlg}}" bindtap="startStopLocation" type="primary">{{ btnText }}</van-button>
+        </van-col>
+        <van-col span="8" offset="4">
+          <van-button plain bindtap="includePoints" type="info">缩放视野</van-button>
+        </van-col>
+      </van-row>
+    </van-cell>
+  </van-cell-group>
 
   <scroll-view scroll-y style="height: 450rpx;">
     <van-row>
@@ -34,7 +38,7 @@
         <van-cell value="{{item.latitude}}, {{item.longitude}}" icon="shop-o" is-link>
           <view slot="title">
             <view class="van-cell-text">{{item.name}}</view>
-            <van-button plain bindtap="setStationCoordinate" type="primary" data-id="{{item.id}} ">更新位置</van-button>
+            <van-button plain disabled="{{!locationFlg}}" bindtap="setStationCoordinate" type="info" data-id="{{item.id}} ">更新位置</van-button>
           </view>
         </van-cell>
       </block>

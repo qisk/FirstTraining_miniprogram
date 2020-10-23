@@ -13,6 +13,9 @@ const INIT_POLYLINE = {
   borderWidth: 2
 };
 
+//获取应用实例
+const app = getApp()
+
 Page({
   data: {
     // 是否正在定位 true:正在定位 false:结束定位
@@ -53,6 +56,9 @@ Page({
     
     // 指定更新的标记点，目前指向中心位置
     markers: [],
+
+    // 演示版本，在界面上屏蔽“开始定位”按钮
+    demoFlg: false
   },
 
   // 在页面onReady函数中创建地图对象
@@ -79,6 +85,15 @@ Page({
     } catch (e) {
       console.log('wx.getStorageSync fail:', e)
     }
+
+    // 在地图上初始化站点和轨迹
+    this.initMarkerAndPolyline(true)
+
+    // 根据app.js的演示版配置，设置按钮可用属性
+    console.log('app.demoFlg:', app.demoFlg)
+    this.setData({
+      demoFlg: app.globalData.demoFlg
+    })
   },
 
  /**
@@ -96,8 +111,12 @@ Page({
   startStopLocation: function () {
     console.log('exec startStopLocation', this.data.locationFlg)
     if (this.data.locationFlg == false) {
-      this.data.locationFlg = true
-      var that = this;
+      // 更新界面
+      this.setData({ 
+        btnText: '结束定位',
+        locationFlg: true
+      })
+
       // 运动轨迹初始化
       this.setData({
         'polyline[0]': {
@@ -108,7 +127,9 @@ Page({
           longitude: 0
         }
       })
-      //将计时器赋值给setInter
+
+      // 设置定时器，并将计时器赋值给setInter
+      var that = this;
       this.data.setInter = setInterval(function () {
         // 地图中心跟随当前位置变化
         that.mapCtx.moveToLocation()
@@ -116,18 +137,24 @@ Page({
         that.drawMovePath()
         console.log('setInterval==', '等待2s后再执行')
       }, 2000)
-      this.setData({ btnText: '结束定位'})
     } else {
-      this.data.locationFlg = false
+      // 更新界面
+      this.setData({
+        btnText: '开始定位',
+        locationFlg: false
+      })
+
       // 关闭定时器
       clearInterval(this.data.setInter)
+      
       // 存储运动轨迹至storage中
       this.saveMovePath()
+      
+      // 重新设置地图位置到初始点
       this.mapCtx.moveToLocation({
         latitude: this.data.latitude, 
         longitude: this.data.longitude,
       })
-      this.setData({ btnText: '开始定位'})
     }
   },
 
@@ -226,11 +253,13 @@ Page({
     if (this.data.direction_checked) {
       wx.setStorage({
         key: "positive_polyline_points",
+        // 由于轨迹点较多，为提升效率，不用JSON.stringify转换成字符串，直接存储为对象
         data: this.data.polyline[0].points
       }) 
     } else {
       wx.setStorage({
         key:"opposite_polyline_points",
+        // 由于轨迹点较多，为提升效率，不用JSON.stringify转换成字符串，直接存储为对象
         data: this.data.polyline[0].points
       }) 
     }
@@ -292,6 +321,67 @@ Page({
     })
   },
   
+
+  initMarkerAndPolyline: function(direction_checked) {
+    let srcStation = []
+
+    if (direction_checked) {
+      // 正向：先从storage中读取，如果获取不到，再读取缺省值
+      var value = wx.getStorageSync('stations_positive_info')
+      if (value) {
+        srcStation = JSON.parse(value)
+      } else {
+        srcStation = simulate.stations_positive_info
+      }
+    } else {
+      // 反向：先从storage中读取，如果获取不到，再读取缺省值
+      var value = wx.getStorageSync('stations_opposite_info')
+      if (value) {
+        srcStation = JSON.parse(value)
+      } else {
+        srcStation = simulate.stations_opposite_info
+      }    
+    }
+
+    console.log('srcStation.length:', srcStation.length)
+
+    // 构造makers信息
+    let markers_info = []
+    if (srcStation.length > 0) {
+      for (var i = 0; i < srcStation.length; i++) {
+        var temp = {
+          id: srcStation[i].id,
+          latitude: srcStation[i].latitude,
+          longitude: srcStation[i].longitude,
+          title: srcStation[i].name,
+        };
+        if (srcStation[i].latitude && srcStation[i].longitude) {
+          markers_info.push(temp)
+        }
+      }
+
+      console.log("markers_info:", markers_info)
+      this.setData({
+        markers: markers_info
+      })
+    }
+    
+    // 尝试从storage中获取polyline信息，由于存入的为JSON对象，这里不需要转换，直接获取
+    let polyline_info = []
+    if (direction_checked) {
+      polyline_info = wx.getStorageSync('positive_polyline_points')
+    } else {
+      polyline_info = wx.getStorageSync('opposite_polyline_points')  
+    }
+
+    if (polyline_info.length > 0) {
+      console.log("polyline_info:", polyline_info)
+      this.setData({
+        'polyline[0].points': polyline_info
+      })
+    }
+  },
+
   // 点击方向复选框的处理函数
   onChange(event) {
     console.log(event.detail)
@@ -318,6 +408,8 @@ Page({
       } catch (e) {
         console.log('wx.getStorageSync fail:', e)
       }
+
+      this.initMarkerAndPolyline(true)
     } else {
       try {
         var value = wx.getStorageSync('stations_opposite_info')
@@ -341,54 +433,15 @@ Page({
       } catch (e) {
         console.log('wx.getStorageSync fail:', e)
       }
+      this.initMarkerAndPolyline(false)
     }
   },
-
-  // 获取地图中心点位置
-  getCenterLocation: function () {
-    this.mapCtx.getCenterLocation({
-      success: function(res){
-        console.log(res.longitude)
-        console.log(res.latitude)
-      }
-    })
-  },
-
-  // 将中心点移动到当前定位的位置
-  moveToLocation: function () {
-    this.mapCtx.moveToLocation()
-  },
-
-  // 将标注1移动到指定位置
-  translateMarker: function() {
-    this.mapCtx.translateMarker({
-      markerId: 1,
-      autoRotate: true,
-      duration: 1000,
-      destination: {
-        latitude:23.10229,
-        longitude:113.3345211,
-      },
-      animationEnd() {
-        console.log('animation end')
-      }
-    })
-  },
-
+  
   // 将多个标记点同时展示在视野中
   includePoints: function() {
     this.mapCtx.includePoints({
-      padding: [50],
-      points: [{
-        latitude: 23.099994,
-        longitude: 113.324520,
-      }, {
-        latitude: 23.099994,
-        longitude: 113.304520,
-      }, {
-        latitude:23.10229,
-        longitude:113.3345211,
-      }]
+      padding: [20],
+      points: this.data.markers,
     })
   }
 })

@@ -40,8 +40,8 @@ const getMapDistance = (lat1, lng1, lat2, lng2) => {
   return s;
 }
 
-// 判断到站的距离（20米）
-const arrive_distance = 20
+// 判断到站的距离（40米）
+const arrive_distance = 40
 
 // 花轨迹线时两点间的距离（50米）
 const polyline_point_distance = 20

@@ -6,6 +6,7 @@
       latitude="{{latitude}}"
       longitude="{{longitude}}"
       markers="{{markers}}"
+      polyline="{{polyline}}"
       covers="{{covers}}"
       show-location
     ></map>

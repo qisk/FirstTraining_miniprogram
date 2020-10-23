@@ -2,6 +2,20 @@ const { default: wxp } = require("../../lib/wxp")
 const util = require("../../utils/util.js")
 const simulate = require("../../utils/bus-track")
 
+const INIT_POLYLINE = {
+  points: [
+    {latitude: 24.4955238, longitude: 118.1180946},
+    {latitude: 24.4955238, longitude: 118.1180946}
+  ],
+  color: '#3875FF',
+  width: 8,
+  dottedLine: false,
+  borderWidth: 2
+};
+
+//获取应用实例
+const app = getApp()
+
 Page({
   data: {   
     // 是否正在报站 true:正在报站 false:结束报站
@@ -31,6 +45,14 @@ Page({
     // 指定标记点，目前指向中心位置
     markers: [],
     
+    // 班车路线轨迹线
+    polyline: [{
+			...INIT_POLYLINE
+    }],
+    
+    // 演示版本打开后，模拟位置索引（针对polyline数组）
+    simulate_position_index: 0
+    
     // covers已废弃
     /*
     covers: [{
@@ -55,7 +77,7 @@ Page({
     })
 
     // 初始化标记站点（正向）
-    this.setMarkers(true)
+    this.setMarkersAndPolyline(true)
 
     // 计算中心点距离标记站点的位置
     for(var i = 0; i < this.data.markers.length; i++) {
@@ -92,16 +114,38 @@ Page({
       var that = this;
       // 将计时器赋值给setInter
       this.data.setInter = setInterval(function () {
-        // 地图中心跟随当前的位置移动
-        that.mapCtx.moveToLocation({
-          success(res) {
-            console.log('res:', res)
-          }
-        })
+        if (app.globalData.demoFlg) {
+          let simulate_position_index = that.data.simulate_position_index
+          // 将地图中心移动到模拟数据点
+          that.mapCtx.moveToLocation({
+            latitude: that.data.polyline[0].points[simulate_position_index].latitude, 
+            longitude: that.data.polyline[0].points[simulate_position_index].longitude,
+            success(res) {
+              console.log('res:', res)
+            }
+          })
+        } else {
+          // 地图中心跟随当前的位置移动
+          that.mapCtx.moveToLocation({
+            success(res) {
+              console.log('res:', res)
+            }
+          })
+        }
 
         // 计算是否到站
-        that.calDistanceToStation(that)
+        that.calDistanceToStation()
         
+        if (app.globalData.demoFlg) {
+          let simulate_position_index = that.data.simulate_position_index
+          // 将索引值 + 1，便于下一个轮询使用，如果到达polyline底部，索引值就不再改变
+          console.log('that.data.polyline[0].points.length:', that.data.polyline[0].points.length)
+          if (simulate_position_index < that.data.polyline[0].points.length - 1) {
+            that.setData({ 
+              simulate_position_index: simulate_position_index + 1
+            })
+          }
+        }
         // 打印下一次执行信息
         console.log('setInterval==', '等待2s后再执行')
       }, 2000)
@@ -114,7 +158,8 @@ Page({
         next_station_id: -1,
         arrive_station_name: '',
         next_station_name: '',
-        next_station_distance: 0
+        next_station_distance: 0,
+        simulate_position_index: 0
       })
 
       clearInterval(this.data.setInter)
@@ -126,70 +171,84 @@ Page({
     }
   },
   
-  // 计算当前点到站点的距离，改变站点的markers颜色
+  // 获取当前位置，计算当前位置到下一个站点的距离
   calDistanceToStation: function() {
-    var that = this;
-    wx.getLocation({
-      type: 'gcj02',
-      isHighAccuracy: true,
-      success (res) {
-        // 获取当前的经纬度
-        const latitude = String(res.latitude)
-        const longitude = String(res.longitude)
-        const speed = res.speed
-        const accuracy = res.accuracy
+    if (app.globalData.demoFlg) {
+      const simulate_position_index = this.data.simulate_position_index
+      const latitude = this.data.polyline[0].points[simulate_position_index].latitude
+      const longitude = this.data.polyline[0].points[simulate_position_index].longitude
 
-        console.log(res, latitude, longitude, speed, accuracy)
-        console.log(that.data.arrive_station_id, that.data.arrive_station_name, that.data.next_station_id, that.data.next_station_name)
+      console.log('simulate_position:', simulate_position_index, latitude, longitude)
+      this.calDistanceArithmetic(latitude, longitude)
+    } else {
+      var that = this;
+      wx.getLocation({
+        type: 'gcj02',
+        isHighAccuracy: true,
+        success (res) {
+          // 获取当前的经纬度
+          const latitude = String(res.latitude)
+          const longitude = String(res.longitude)
+          const speed = res.speed
+          const accuracy = res.accuracy
 
-        // 如果未到终点站，则计算是否到达下一个站点，以及距离下一个站点还有多远
-        if (that.data.arrive_station_id < that.data.markers.length - 1) {
-          const distance = util.getMapDistance(that.data.markers[that.data.next_station_id].latitude, that.data.markers[that.data.next_station_id].longitude, latitude, longitude)
-          
-          console.log('distance:', distance)
-
-          let updateNextStationFlg = false
-
-          // 如果距离下一站点的距离小于到站范围，则判断为已到站，更新到达站点及下一个站点
-          if (distance < util.arrive_distance) {
-            let arrive_station_id = that.data.next_station_id
-            let next_station_id = that.data.next_station_id + 1
-
-            // 获取下一个站点的名称
-            let next_station_title = (next_station_id >= that.data.markers.length)? '无' : that.data.markers[next_station_id].title
-
-            console.log("已到站:", arrive_station_id, that.data.markers[arrive_station_id].title, next_station_id, next_station_title)
-
-            that.setData({
-              arrive_station_id: arrive_station_id,
-              arrive_station_name: that.data.markers[arrive_station_id].title,
-              next_station_id: next_station_id,
-              next_station_name: next_station_title
-            })
-            updateNextStationFlg = true
-          }
-
-          if (updateNextStationFlg) {
-            // 更新了下一个站点索引，因此要重新计算到下一个站点的距离
-            if (that.data.next_station_id < that.data.markers.length) {
-              // 有下一个站点，重新计算到下一个节点的距离
-              const distance_new = util.getMapDistance(that.data.markers[that.data.next_station_id].latitude, that.data.markers[that.data.next_station_id].longitude, latitude, longitude)
-            } else {
-              // 无下一个站点（已达终点站），将距离设置为0
-              const distance_new = 0
-            }
-            that.setData({
-              next_station_distance: distance_new,
-            })
-          } else {
-            // 直接使用上面计算过的距离，更新页面
-            that.setData({
-              next_station_distance: distance,
-            })
-          }
+          console.log('real gps position:', res, latitude, longitude, speed, accuracy)
+          that.calDistanceArithmetic(latitude, longitude)
         }
+      })
+    }
+  },
+
+  // 计算当前点到下个站点的距离算法
+  calDistanceArithmetic: function(latitude, longitude) {
+    console.log(this.data.arrive_station_id, this.data.arrive_station_name, this.data.next_station_id, this.data.next_station_name)
+
+    // 如果未到终点站，则计算是否到达下一个站点，以及距离下一个站点还有多远
+    if (this.data.arrive_station_id < this.data.markers.length - 1) {
+      const distance = util.getMapDistance(this.data.markers[this.data.next_station_id].latitude, this.data.markers[this.data.next_station_id].longitude, latitude, longitude)
+
+      console.log('distance:', distance)
+
+      let updateNextStationFlg = false
+
+      // 如果距离下一站点的距离小于到站范围，则判断为已到站，更新到达站点及下一个站点
+      if (distance < util.arrive_distance) {
+        let arrive_station_id = this.data.next_station_id
+        let next_station_id = this.data.next_station_id + 1
+
+        // 获取下一个站点的名称
+        let next_station_title = (next_station_id >= this.data.markers.length) ? '无' : this.data.markers[next_station_id].title
+
+        console.log("已到站:", arrive_station_id, this.data.markers[arrive_station_id].title, next_station_id, next_station_title)
+
+        this.setData({
+          arrive_station_id: arrive_station_id,
+          arrive_station_name: this.data.markers[arrive_station_id].title,
+          next_station_id: next_station_id,
+          next_station_name: next_station_title
+        })
+        updateNextStationFlg = true
       }
-    })
+
+      if (updateNextStationFlg) {
+        // 更新了下一个站点索引，因此要重新计算到下一个站点的距离
+        if (this.data.next_station_id < this.data.markers.length) {
+          // 有下一个站点，重新计算到下一个节点的距离
+          const distance_new = util.getMapDistance(this.data.markers[this.data.next_station_id].latitude, this.data.markers[this.data.next_station_id].longitude, latitude, longitude)
+        } else {
+          // 无下一个站点（已达终点站），将距离设置为0
+          const distance_new = 0
+        }
+        this.setData({
+          next_station_distance: distance_new,
+        })
+      } else {
+        // 直接使用上面计算过的距离，更新页面
+        this.setData({
+          next_station_distance: distance,
+        })
+      }
+    }
   },
 
   // 点击方向复选框的处理函数
@@ -206,10 +265,10 @@ Page({
         direction_name: '岳阳小区方向',
       })
     }
-    this.setMarkers(event.detail)
+    this.setMarkersAndPolyline(event.detail)
   },
 
-  setMarkers: function(direction_checked) {
+  setMarkersAndPolyline: function(direction_checked) {
     let srcVal
     let station_info = []
     if (direction_checked) {
@@ -246,6 +305,21 @@ Page({
     this.setData({
       markers: station_info
     })
+
+    // 尝试从storage中获取polyline信息，由于存入的为JSON对象，这里不需要转换，直接获取
+    let polyline_info = []
+    if (direction_checked) {
+      polyline_info = wx.getStorageSync('positive_polyline_points')
+    } else {
+      polyline_info = wx.getStorageSync('opposite_polyline_points')  
+    }
+
+    if (polyline_info.length > 0) {
+      console.log("polyline_info:", polyline_info)
+      this.setData({
+        'polyline[0].points': polyline_info
+      })
+    }  
   },
 
   // 获取地图中心点位置
@@ -282,7 +356,7 @@ Page({
   // 将多个标记点同时展示在视野中
   includePoints: function() {
     this.mapCtx.includePoints({
-      padding: [50],
+      padding: [20],
       points: this.data.markers
     })
   }

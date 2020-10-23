@@ -10,7 +10,8 @@ App({
   globalEvent: (wx.globalEvent = new Event()),
 
   globalData: {
-    userInfo: null
+    userInfo: null,
+    demoFlg: true, // 是否为演示版本
   },
 
   onLaunch: function () {
