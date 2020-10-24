@@ -2,6 +2,19 @@ const { default: wxp } = require("../../lib/wxp")
 const util = require("../../utils/util.js")
 const simulate = require("../../utils/bus-track")
 
+// 模拟为位置点(id=10000)
+const INIT_MARKER = {
+  id: 10000,
+	latitude: 24.4955238,
+	longitude: 118.1180946,
+	iconPath: './imgs/Marker3_Activated@3x.png',
+	width: '34px',
+	height: '34px',
+	rotate: 0,
+	alpha: 1
+};
+
+// polyline需要有一个points初始值INIT_POLYLINE，不然会出现渲染警告提示
 const INIT_POLYLINE = {
   points: [
     {latitude: 24.4955238, longitude: 118.1180946},
@@ -42,7 +55,7 @@ Page({
     latitude: 24.4955238,
     longitude: 118.1180946,
     
-    // 指定标记点，目前指向中心位置
+    // 班车站点标记点
     markers: [],
     
     // 班车路线轨迹线
@@ -50,6 +63,9 @@ Page({
 			...INIT_POLYLINE
     }],
     
+    // 班车站点数量
+    station_count: 0,
+
     // 演示版本打开后，模拟位置索引（针对polyline数组）
     simulate_position_index: 0
     
@@ -78,12 +94,6 @@ Page({
 
     // 初始化标记站点（正向）
     this.setMarkersAndPolyline(true)
-
-    // 计算中心点距离标记站点的位置
-    for(var i = 0; i < this.data.markers.length; i++) {
-      const distance = util.getMapDistance(this.data.markers[i].latitude, this.data.markers[i].longitude, this.data.latitude, this.data.longitude)
-      console.log(`the center point distance markers ${i}`, distance)
-    }
   },
 
   /**
@@ -111,18 +121,28 @@ Page({
         next_station_name: this.data.markers[0].title,
       })
 
-      var that = this;
+      var that = this
+      let interval_time = 2000
+      if (app.globalData.demoFlg) {
+        interval_time = 2000
+      }
       // 将计时器赋值给setInter
       this.data.setInter = setInterval(function () {
         if (app.globalData.demoFlg) {
           let simulate_position_index = that.data.simulate_position_index
-          // 将地图中心移动到模拟数据点
+          // 将地图中心移动到模拟数据点（注意：不会显示绿色当前位置，需要使用自定义Marker标注当前位置）
           that.mapCtx.moveToLocation({
             latitude: that.data.polyline[0].points[simulate_position_index].latitude, 
             longitude: that.data.polyline[0].points[simulate_position_index].longitude,
             success(res) {
               console.log('res:', res)
             }
+          })
+
+          // 将模拟定位点移到当前位置
+          that.translateMarker({
+            latitude: that.data.polyline[0].points[simulate_position_index].latitude, 
+            longitude: that.data.polyline[0].points[simulate_position_index].longitude
           })
         } else {
           // 地图中心跟随当前的位置移动
@@ -148,7 +168,7 @@ Page({
         }
         // 打印下一次执行信息
         console.log('setInterval==', '等待2s后再执行')
-      }, 2000)
+      }, interval_time)
       this.setData({ btnText: '结束报站'})
     } else {
       this.data.locationFlg = false
@@ -201,10 +221,10 @@ Page({
 
   // 计算当前点到下个站点的距离算法
   calDistanceArithmetic: function(latitude, longitude) {
-    console.log(this.data.arrive_station_id, this.data.arrive_station_name, this.data.next_station_id, this.data.next_station_name)
+    console.log(this.data.arrive_station_id, this.data.arrive_station_name, this.data.next_station_id, this.data.next_station_name, this.data.station_count)
 
     // 如果未到终点站，则计算是否到达下一个站点，以及距离下一个站点还有多远
-    if (this.data.arrive_station_id < this.data.markers.length - 1) {
+    if (this.data.arrive_station_id < this.data.station_count - 1) {
       const distance = util.getMapDistance(this.data.markers[this.data.next_station_id].latitude, this.data.markers[this.data.next_station_id].longitude, latitude, longitude)
 
       console.log('distance:', distance)
@@ -217,7 +237,7 @@ Page({
         let next_station_id = this.data.next_station_id + 1
 
         // 获取下一个站点的名称
-        let next_station_title = (next_station_id >= this.data.markers.length) ? '无' : this.data.markers[next_station_id].title
+        let next_station_title = (next_station_id >= this.data.station_count) ? '无' : this.data.markers[next_station_id].title
 
         console.log("已到站:", arrive_station_id, this.data.markers[arrive_station_id].title, next_station_id, next_station_title)
 
@@ -231,13 +251,11 @@ Page({
       }
 
       if (updateNextStationFlg) {
+        let distance_new = 0
         // 更新了下一个站点索引，因此要重新计算到下一个站点的距离
-        if (this.data.next_station_id < this.data.markers.length) {
+        if (this.data.next_station_id < this.data.station_count) {
           // 有下一个站点，重新计算到下一个节点的距离
           const distance_new = util.getMapDistance(this.data.markers[this.data.next_station_id].latitude, this.data.markers[this.data.next_station_id].longitude, latitude, longitude)
-        } else {
-          // 无下一个站点（已达终点站），将距离设置为0
-          const distance_new = 0
         }
         this.setData({
           next_station_distance: distance_new,
@@ -269,11 +287,11 @@ Page({
   },
 
   setMarkersAndPolyline: function(direction_checked) {
-    let srcVal
+    let srcVal = []
     let station_info = []
     if (direction_checked) {
       // 正向：先从storage中读取，如果获取不到，再读取缺省值
-      var value = wx.getStorageSync('stations_positive_info')
+      let value = wx.getStorageSync('stations_positive_info')
       if (value) {
         srcVal = JSON.parse(value)
       } else {
@@ -281,7 +299,7 @@ Page({
       }
     } else {
       // 反向：先从storage中读取，如果获取不到，再读取缺省值
-      var value = wx.getStorageSync('stations_opposite_info')
+      let value = wx.getStorageSync('stations_opposite_info')
       if (value) {
         srcVal = JSON.parse(value)
       } else {
@@ -290,7 +308,13 @@ Page({
     }
     if (srcVal) {
       for (var i = 0; i < srcVal.length; i++) {
-        var temp = {
+        let temp = {
+          callout: {
+            content: srcVal[i].name,
+            padding: 10,
+            borderRadius: 2,
+            display: 'ALWAYS'
+          },
           id: srcVal[i].id,
           latitude: srcVal[i].latitude,
           longitude: srcVal[i].longitude,
@@ -301,9 +325,12 @@ Page({
         }
       }
     }
+    
+    station_info.push(INIT_MARKER)
     console.log("station_info:", station_info)
     this.setData({
-      markers: station_info
+      markers: station_info,
+      station_count: srcVal.length
     })
 
     // 尝试从storage中获取polyline信息，由于存入的为JSON对象，这里不需要转换，直接获取
@@ -338,14 +365,14 @@ Page({
   },
 
   // 将标注1移动到指定位置
-  translateMarker: function() {
+  translateMarker: function(e) {
     this.mapCtx.translateMarker({
-      markerId: 1,
-      autoRotate: true,
-      duration: 1000,
+      markerId: 10000,
+      autoRotate: false,
+      duration: 10,
       destination: {
-        latitude:23.10229,
-        longitude:113.3345211,
+        latitude: e.latitude,
+        longitude: e.longitude,
       },
       animationEnd() {
         console.log('animation end')

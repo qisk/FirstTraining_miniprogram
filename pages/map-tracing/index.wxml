@@ -37,15 +37,15 @@
 
   <van-cell-group>
     <van-cell size="large"> 
-      <van-col  span="6">到达站点: </van-col>
+      <van-col  span="8">到达站点: </van-col>
       <van-col span="8" offset="4">{{arrive_station_name}}</van-col>
     </van-cell>
     <van-cell size="large">
-      <van-col span="6">下一站点: </van-col>
+      <van-col span="8">下一站点: </van-col>
       <van-col span="8" offset="4">{{next_station_name}}</van-col>
     </van-cell>
     <van-cell size="large">
-      <van-col span="6">距离: </van-col>
+      <van-col span="8">距离下一站: </van-col>
       <van-col span="8" offset="4">{{next_station_distance}}米</van-col>
     </van-cell>
   </van-cell-group>
