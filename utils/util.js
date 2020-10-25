@@ -36,7 +36,7 @@ const getMapDistance = (lat1, lng1, lat2, lng2) => {
   s = s * 6378.137;// EARTH_RADIUS;
   s = Math.round(s * 10000) / 10000; //输出为公里
   s = s * 1000; // 输出为米
-  //s=s.toFixed(2);
+  s=s.toFixed(2);
   return s;
 }
 

@@ -124,12 +124,17 @@ Page({
       var that = this
       let interval_time = 2000
       if (app.globalData.demoFlg) {
-        interval_time = 2000
+        interval_time = 1000
       }
       // 将计时器赋值给setInter
       this.data.setInter = setInterval(function () {
         if (app.globalData.demoFlg) {
           let simulate_position_index = that.data.simulate_position_index
+          // 将模拟定位点移到当前位置
+          that.translateMarker({
+            latitude: that.data.polyline[0].points[simulate_position_index].latitude,
+            longitude: that.data.polyline[0].points[simulate_position_index].longitude
+          })
           // 将地图中心移动到模拟数据点（注意：不会显示绿色当前位置，需要使用自定义Marker标注当前位置）
           that.mapCtx.moveToLocation({
             latitude: that.data.polyline[0].points[simulate_position_index].latitude, 
@@ -137,12 +142,6 @@ Page({
             success(res) {
               console.log('res:', res)
             }
-          })
-
-          // 将模拟定位点移到当前位置
-          that.translateMarker({
-            latitude: that.data.polyline[0].points[simulate_position_index].latitude, 
-            longitude: that.data.polyline[0].points[simulate_position_index].longitude
           })
         } else {
           // 地图中心跟随当前的位置移动
