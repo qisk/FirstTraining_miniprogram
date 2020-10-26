@@ -350,8 +350,23 @@ Page({
     let polyline_info = []
     if (direction_checked) {
       polyline_info = wx.getStorageSync('positive_polyline_points')
+      console.log('polyline_info:', polyline_info)
+      if (!polyline_info){
+        polyline_info = simulate.positive_polyline_points_info
+        wx.setStorage({
+          key:"positive_polyline_points",
+          data: simulate.positive_polyline_points_info
+        }) 
+      }
     } else {
-      polyline_info = wx.getStorageSync('opposite_polyline_points')  
+      polyline_info = wx.getStorageSync('opposite_polyline_points')
+      if (!polyline_info){
+        polyline_info = simulate.opposite_polyline_points_info
+        wx.setStorage({
+          key:"opposite_polyline_points",
+          data: simulate.opposite_polyline_points_info
+        }) 
+      }
     }
 
     if (polyline_info.length > 0) {
