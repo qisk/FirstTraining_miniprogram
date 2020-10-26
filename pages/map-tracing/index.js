@@ -110,6 +110,18 @@ Page({
 
   startStopLocation: function () {
     console.log('exec startStopLocation', this.data.locationFlg)
+
+    const version = wx.getSystemInfoSync().SDKVersion
+    console.log('基础库版本号:', version)
+    // 判断基础库版本号
+    if (util.compareVersion(version, '1.2.0') < 0) {
+      // 如果希望用户在最新版本的客户端上体验您的小程序，可以这样子提示
+      wx.showModal({
+        title: '提示',
+        content: '当前微信版本过低，无法使用该功能，请升级到最新微信版本后重试。'
+      })
+    }
+
     if (this.data.locationFlg == false) {
       this.data.locationFlg = true
 
@@ -129,21 +141,23 @@ Page({
       // 将计时器赋值给setInter
       this.data.setInter = setInterval(function () {
         if (app.globalData.demoFlg) {
+          console.log('演示模式，使用模拟GPS位置')
           let simulate_position_index = that.data.simulate_position_index
           // 将模拟定位点移到当前位置
           that.translateMarker({
-            latitude: that.data.polyline[0].points[simulate_position_index].latitude,
-            longitude: that.data.polyline[0].points[simulate_position_index].longitude
+            latitude: parseFloat(that.data.polyline[0].points[simulate_position_index].latitude),
+            longitude: parseFloat(that.data.polyline[0].points[simulate_position_index].longitude)
           })
           // 将地图中心移动到模拟数据点（注意：不会显示绿色当前位置，需要使用自定义Marker标注当前位置）
           that.mapCtx.moveToLocation({
-            latitude: that.data.polyline[0].points[simulate_position_index].latitude, 
-            longitude: that.data.polyline[0].points[simulate_position_index].longitude,
+            latitude: parseFloat(that.data.polyline[0].points[simulate_position_index].latitude), 
+            longitude: parseFloat(that.data.polyline[0].points[simulate_position_index].longitude),
             success(res) {
               console.log('res:', res)
             }
           })
         } else {
+          console.log('演示模式，使用真实GPS位置')
           // 地图中心跟随当前的位置移动
           that.mapCtx.moveToLocation({
             success(res) {
@@ -365,16 +379,17 @@ Page({
 
   // 将标注1移动到指定位置
   translateMarker: function(e) {
+    console.log('translateMarker destination:', e)
     this.mapCtx.translateMarker({
       markerId: 10000,
       autoRotate: false,
-      duration: 10,
-      destination: {
-        latitude: e.latitude,
-        longitude: e.longitude,
-      },
+      duration: 100,
+      destination: e,
       animationEnd() {
         console.log('animation end')
+      },
+      success(res) {
+        console.log('translateMarker res:', res)
       }
     })
   },

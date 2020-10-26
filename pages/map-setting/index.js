@@ -90,7 +90,7 @@ Page({
     this.initMarkerAndPolyline(true)
 
     // 根据app.js的演示版配置，设置按钮可用属性
-    console.log('app.demoFlg:', app.demoFlg)
+    console.log('app.globalData.demoFlg:', app.globalData.demoFlg)
     this.setData({
       demoFlg: app.globalData.demoFlg
     })
@@ -370,8 +370,23 @@ Page({
     let polyline_info = []
     if (direction_checked) {
       polyline_info = wx.getStorageSync('positive_polyline_points')
+      console.log('polyline_info:', polyline_info)
+      if (!polyline_info){
+        polyline_info = simulate.positive_polyline_points_info
+        wx.setStorage({
+          key:"positive_polyline_points",
+          data: simulate.positive_polyline_points_info
+        }) 
+      }
     } else {
-      polyline_info = wx.getStorageSync('opposite_polyline_points')  
+      polyline_info = wx.getStorageSync('opposite_polyline_points')
+      if (!polyline_info){
+        polyline_info = simulate.opposite_polyline_points_info
+        wx.setStorage({
+          key:"opposite_polyline_points",
+          data: simulate.opposite_polyline_points_info
+        }) 
+      }
     }
 
     if (polyline_info.length > 0) {
@@ -438,10 +453,58 @@ Page({
   },
   
   // 将多个标记点同时展示在视野中
-  includePoints: function() {
+  includePoints: async function() {
     this.mapCtx.includePoints({
       padding: [20],
       points: this.data.markers,
     })
+  },
+
+  uploadStorageData: async function () {
+    // 在本地用户文件目录下创建一个文件 hello.txt，写入内容 "hello, world"
+    const fs = wx.getFileSystemManager()
+    console.log('wx.env.USER_DATA_PATH', wx.env.USER_DATA_PATH)
+    fs.writeFile({
+      filePath: `${wx.env.USER_DATA_PATH}/hello.txt`,
+      data: 'hello, world',
+      encoding: 'utf8',
+      success(res) {
+        console.log(' successres:', res)
+      },
+      fail(res) {
+        console.log('fail res:', res)
+      },
+    })
+
+    /*
+    // 将storage中的站点数据发送到服务端
+    let positive_info = wx.getStorageSync('stations_positive_info')
+    let opposite_info = wx.getStorageSync('stations_opposite_info')
+ 
+    let data = {
+      positive_info,
+      opposite_info,
+    }
+    */
+
+    // 将storage中的轨迹数据发送到服务端
+    let positive_info = JSON.stringify(wx.getStorageSync('positive_polyline_points'))
+    let opposite_info = JSON.stringify(wx.getStorageSync('opposite_polyline_points'))
+
+    let data = {
+      positive_info,
+      opposite_info,
+    }
+
+    let res = await wxp.request_without_login({
+      url: util.ipAddress + `/goods/goods-test/`,
+      method: 'post',
+      data
+    })
+    if (res.data.msg == 'ok') {
+      wx.showToast({
+        title: '发送成功',
+      })
+    }
   }
 })
