@@ -1,0 +1,16 @@
+<!--pages/confirm-order/index.wxml-->
+<van-cell-group>
+  <van-cell icon="location-o" size="large" title="姓名:王二" value="16713454657" label ="快递地址：xxxxxxx" />
+</van-cell-group>
+
+<view style="padding:10px">
+  <van-cell-group>
+    <van-card price="{{20}}元" desc="规格" title="商品名称" thumb="">
+      <view slot="footer">x{{1}}</view>
+    </van-card>
+
+    <van-card price="{{20}}元" desc="规格" title="商品名称" thumb="">
+      <view slot="footer">x{{1}}</view>
+    </van-card>
+  </van-cell-group>
+</view>
