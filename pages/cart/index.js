@@ -8,6 +8,7 @@ Page({
    * 页面的初始数据
    */
   data: {
+    showLoginPanel:false,
     cartIdSelectedResult:[],
     allIsSelected:false,
     editMode:false,
@@ -36,8 +37,11 @@ Page({
 
     // 全选，将所有checkbox name塞入cartIdSelectedResult
     if (allIsSelected) {
-      cartIdSelectedResult.push("1")
-      cartIdSelectedResult.push("2")
+      let carts = this.data.carts
+      for (let j=0; j<carts.length; j++) {
+        // 必须推入一个字符串类型的id
+        cartIdSelectedResult.push(`${carts[j].id}`)
+      } 
     }
 
     this.setData({
@@ -68,6 +72,45 @@ Page({
     }
   },
 
+  removeCartGoods: async function(e) {
+    // ids是一个数组，表示选择的集合
+    let ids = this.data.cartIdSelectedResult
+    if (ids.length == 0) {
+      wx.showToast({
+        title: '没有选择商品',
+        showCancel: false
+      })
+      return
+    }
+
+    console.log('ids:', ids)
+
+    let data = {ids}
+    let res = await wxp.request_with_login({
+      url: util.ipAddress + `/user/my/carts`,
+      method: 'delete',
+      data
+    })
+
+    if (res.data.msg == 'ok') {
+      let carts = this.data.carts
+      for (let j=0; j<ids.length; j++) {
+        let id = ids[j]
+        // 从carts中依次取出数据
+        carts.some((item, index)=>{
+          if (item.id == id) {
+            carts.splice(index, 1)
+            return true
+          }
+          return false
+        })
+      }
+      this.setData({
+        carts
+      })
+    }
+  },
+
   /**
    * 生命周期函数--监听页面加载
    */
@@ -94,8 +137,17 @@ Page({
   /**
    * 生命周期函数--监听页面显示
    */
-  onShow: function () {
-
+  onShow: async function () {
+    // 拉取购物车数据
+    let res = await wxp.request_with_login({
+      url: util.ipAddress + `/user/my/cart`
+    })
+    if (res.data.msg == "ok") {
+      let carts = res.data.data
+      this.setData({
+        carts
+      })
+    }
   },
 
   /**

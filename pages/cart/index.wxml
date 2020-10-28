@@ -37,3 +37,5 @@
     <van-button bindtap="removeCartGoods" size="mini" slot="right-icon" plain type="info">删除</van-button>
   </van-cell>
 </van-cell-group>
+
+<LoginPanel show="{{showLoginPanel}}"></LoginPanel>

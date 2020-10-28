@@ -1,6 +1,5 @@
 {
   "pages": [
-    "pages/map-setting/index",
     "pages/cart/index",
     "pages/category/index",
     "pages/vant-test/index",
@@ -8,6 +7,7 @@
     "pages/request-login-test/index",
     "pages/extend-page/index",
     "pages/goods/index",
+    "pages/map-setting/index",
     "pages/map-tracing/index"
   ],
   "window": {
