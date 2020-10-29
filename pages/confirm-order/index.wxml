@@ -32,4 +32,4 @@
   <van-cell custom-class="total-price" title="" value="合计: ¥900" />
 </van-cell-group>
 
-<van-submit-bar bind:submit="onSubmit" price="{{ 3050 }}" button-text="提交订单" />
+<van-submit-bar bind:submit="onSubmit" price="{{ totalPrice }}" button-text="提交订单" />

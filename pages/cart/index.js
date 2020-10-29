@@ -13,6 +13,7 @@ Page({
     allIsSelected:false,
     editMode:false,
     carts:[],
+    totalPrice: 0
   },
 
   onSelectGoodsItem(e) {
@@ -20,6 +21,7 @@ Page({
     this.setData({
       cartIdSelectedResult,
     })
+    this.calcTotalPrice()
   },
 
   changeEditMode(e) {
@@ -48,6 +50,8 @@ Page({
       allIsSelected,
       cartIdSelectedResult
     })
+
+    this.calcTotalPrice()
   },
 
   async onCartGoodsNumChanged(e) {
@@ -69,7 +73,23 @@ Page({
       wx.showToast({
         title: num > oldNum ? '增加成功' : '减少成功',
       })
+
+      // 这里需要改变carts数组中实际的商品数量
+      let carts = this.data.carts
+      carts.some(item=>{
+        if (item.id == cartGoodsId) {
+          // item是carts中元素的引用，修改item的值，实际就修改了carts中的元素值
+          item.num = num
+          return true
+        }
+        return false
+      })
+      this.setData({
+        carts
+      })
     }
+
+    this.calcTotalPrice()
   },
 
   removeCartGoods: async function(e) {
@@ -138,8 +158,30 @@ Page({
     wx.navigateTo({
       url: '/pages/confirm-order/index',
       success:res=>{
-        res.eventChannel.emit('cartData', {data:cartData})
+        res.eventChannel.emit('cartData', {data:cartData, totalPrice:this.data.totalPrice})
       }
+    })
+  },
+
+  // 计算选择的商品总价
+  calcTotalPrice() {
+    let totalPrice = 0
+    let carts = this.data.carts
+    let ids = this.data.cartIdSelectedResult
+
+    // 计算已选择商品的总价格
+    ids.forEach(id=>{
+      carts.some(item=>{
+        if (item.id == id) {
+          totalPrice += item.price * item.num
+          return true
+        }
+        return false
+      })
+    })
+
+    this.setData({
+      totalPrice
     })
   },
 

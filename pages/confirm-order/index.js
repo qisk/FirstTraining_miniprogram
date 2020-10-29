@@ -6,6 +6,22 @@ Page({
    */
   data: {
     carts: [],
+    totalPrice: 0
+  },
+
+  // 计算选择的商品总价
+  calcTotalPrice() {
+    let totalPrice = 0
+    let carts = this.data.carts
+
+    // 计算已选择商品的总价格
+    carts.forEach(item=>{
+      totalPrice += item.price * item.num
+    })
+
+    this.setData({
+      totalPrice
+    })
   },
 
   /**
@@ -17,10 +33,13 @@ Page({
     if (eventChannel != undefined && JSON.stringify(eventChannel) != "{}") {
       eventChannel.on('cartData', res=>{
         this.setData({
-          carts:res.data
+          carts:res.data,
+          totalPrice: res.totalPrice
         })
       })
     }
+    // 不调用calcTotalPrice，总价直接从购物车页面传递过来
+    //this.calcTotalPrice()
   },
 
   /**
