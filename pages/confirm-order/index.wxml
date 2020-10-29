@@ -1,6 +1,6 @@
 <!--pages/confirm-order/index.wxml-->
 <van-cell-group>
-  <van-cell icon="location-o" size="large" title="姓名:王二" value="16713454657" label ="快递地址：xxxxxxx" />
+  <van-cell bind:click="toSelectAddress" icon="location-o" size="large" title="姓名:王二" value="16713454657" label ="快递地址：xxxxxxx" />
 </van-cell-group>
 
 <view style="padding:10px">

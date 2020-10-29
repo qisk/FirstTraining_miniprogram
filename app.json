@@ -1,5 +1,6 @@
 {
   "pages": [
+    "pages/address-list/index",
     "pages/cart/index", 
     "pages/confirm-order/index",
     "pages/category/index",
@@ -10,8 +11,7 @@
     "pages/goods/index",
     "pages/map-setting/index",
     "pages/map-tracing/index",
-    "pages/new-address/index",
-    "pages/address-list/index"
+    "pages/new-address/index"
   ],
   "window": {
     "backgroundTextStyle": "light",
