@@ -111,6 +111,38 @@ Page({
     }
   },
 
+  onSubmit(e) {
+    let ids = this.data.cartIdSelectedResult
+    if (ids.length == 0) {
+      wx.showToast({
+        title: '还未选择商品',
+        showCancel: false
+      })
+      return
+    }
+
+    // 从ids中获取商品数据信息，放置到cartData数组中
+    let cartData = []
+    let carts = this.data.carts
+    ids.forEach(id=>{
+      carts.some(item=>{
+        if (item.id == id) {
+          cartData.push( Object.assign({}, item))
+          return true
+        }
+        return false
+      })
+    })
+
+    // 向跳转页面发送数据
+    wx.navigateTo({
+      url: '/pages/confirm-order/index',
+      success:res=>{
+        res.eventChannel.emit('cartData', {data:cartData})
+      }
+    })
+  },
+
   /**
    * 生命周期函数--监听页面加载
    */

@@ -24,7 +24,7 @@
   </block>
 </van-checkbox-group>
 
-<van-submit-bar wx:if="{{ !editMode }}" price="{{ 3050 }}" button-text="提交订单">
+<van-submit-bar bind:submit="onSubmit" wx:if="{{ !editMode }}" price="{{ 3050 }}" button-text="提交订单">
   <van-checkbox value="{{ allIsSelected }}" bind:change="onSelectAll" shape="square">全选</van-checkbox>
   <view wx:if="{{false}}" slot="tip">您的收货地址</view>
 </van-submit-bar>

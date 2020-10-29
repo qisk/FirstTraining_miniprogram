@@ -1,1 +1,9 @@
 /* pages/confirm-order/index.wxss */
+
+page {
+  padding-bottom: 200px;
+}
+
+.total-price .van-cell__value {
+  color: rgb(173, 117, 42) !important;
+}

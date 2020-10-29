@@ -5,12 +5,31 @@
 
 <view style="padding:10px">
   <van-cell-group>
-    <van-card price="{{20}}元" desc="规格" title="商品名称" thumb="">
-      <view slot="footer">x{{1}}</view>
-    </van-card>
-
-    <van-card price="{{20}}元" desc="规格" title="商品名称" thumb="">
-      <view slot="footer">x{{1}}</view>
-    </van-card>
+    <block wx:for="{{carts}}" wx:key="id">
+      <van-card price="{{item.price * item.num/100}}元" desc="{{item.goods_sku_desc}}" title="{{item.goods_name}}" thumb="{{item.goods_image}}">
+        <view slot="footer">{{item.num}}</view>
+      </van-card>
+    </block>
   </van-cell-group>
 </view>
+
+<van-cell-group title=" ">
+  <van-cell title="优惠" value="暂无优惠" is-link />
+</van-cell-group>
+
+<van-cell-group title=" ">
+  <van-cell title="快递方式" value="快递免运费" is-link />
+  <van-field
+    label="买家留言"
+    placeholder="请输入留言"
+    border="{{ false }}"
+  />
+</van-cell-group>
+
+<van-cell-group title=" ">
+  <van-cell title="商品金额" value="¥900" />
+  <van-cell title="运费" value="+ ¥0" />
+  <van-cell custom-class="total-price" title="" value="合计: ¥900" />
+</van-cell-group>
+
+<van-submit-bar bind:submit="onSubmit" price="{{ 3050 }}" button-text="提交订单" />
