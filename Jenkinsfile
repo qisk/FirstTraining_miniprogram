@@ -4,10 +4,14 @@ pipeline {
 			}
 
     stages {
-        stage('Build') {
+        stage('getCommitMessage') {
             steps {
-                echo 'Building..'
-                echo 'test'
+                def commit_message = getCommitMessage()
+					      echo "commit_message=${commit_message}"
+
+                def commitIdAndAuthor = getCommitIdAndAuthor()
+						    echo "commitIdAndAuthor=${commitIdAndAuthor}"
+						    currentBuild.displayName = "${commitIdAndAuthor}"
             }
         }
         stage('Test') {
@@ -21,4 +25,26 @@ pipeline {
             }
         }
     }
+}
+
+def getCommitMessage() {
+	def text = ""
+	for (changeSetList in currentBuild.changeSets) {
+		for (changeSet in changeSetList) {
+			if (!"${changeSet.msg}".contains("groovy")) {
+				text += "${changeSet.author.fullName} ${changeSet.msg}\n"
+			}
+		}
+	}
+	return text
+}
+
+def getCommitIdAndAuthor() {
+	def text = ""
+	for (changeSetList in currentBuild.changeSets) {
+		for (changeSet in changeSetList) {
+				text += "${changeSet.commitId}_${changeSet.author}\n"
+		}
+	}
+	return text
 }
