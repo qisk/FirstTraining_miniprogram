@@ -1,4 +1,5 @@
-// test jenkins SCM change 
+// test jenkins SCM change
+// test jenkins SCM change for pipeline 
 // pages/address-list/index.js
 Page({
 
