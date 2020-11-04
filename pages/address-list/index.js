@@ -1,3 +1,4 @@
+// test jenkins SCM change 
 // pages/address-list/index.js
 Page({
 
