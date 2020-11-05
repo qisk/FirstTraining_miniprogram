@@ -9,7 +9,7 @@ pipeline {
         stage('getCommitMessage') {
             steps {
                 script {
-                  echo "BRANCH_NAME=${BRANCH_NAME}, CHANGE_ID=${CHANGE_ID}"
+                  echo "BRANCH_NAME=${BRANCH_NAME}"
 
                   def commit_message = getCommitMessage()
                   echo "commit_message=${commit_message}"
