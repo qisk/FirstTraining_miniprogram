@@ -3,6 +3,10 @@ pipeline {
 				label 'master'
 			}
 
+    environment {
+        COMMITID_LENGTH = 7
+    }
+
     stages {
         stage('getCommitMessage') {
             steps {
@@ -45,7 +49,8 @@ def getCommitIdAndAuthor() {
 	def text = ""
 	for (changeSetList in currentBuild.changeSets) {
 		for (changeSet in changeSetList) {
-				text += "${changeSet.commitId}_${changeSet.author}\n"
+      	def length = changeSet.commitId.length() - COMMITID_LENGTH
+				text += "${changeSet.commitId.substring(length)}_${changeSet.author}\n"
 		}
 	}
 	return text
