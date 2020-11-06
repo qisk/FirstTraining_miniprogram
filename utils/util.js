@@ -16,7 +16,7 @@ const formatNumber = n => {
 
 //const ipAddress = "http://localhost:3000"         // 服务端本地URL
 const ipAddress = "http://192.168.31.115:3000"      // 服务端Wi-Fi局域网URL
-//const ipAddress = "http://a5b55799d22c.ngrok.io"  // ngrok互联网URL 
+//const ipAddress = "http://a5b55799d22c.ngrok.io"  // ngrok互联网URL
 
 //进行经纬度转换为距离的计算
 function Rad(d){
