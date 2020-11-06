@@ -9,6 +9,7 @@ pipeline {
         stage('getCommitMessage') {
             steps {
                 script {
+                  echo "Github push notification test"
                   echo "BRANCH_NAME=${BRANCH_NAME}"
                   
                   def commit_message = getCommitMessage()
