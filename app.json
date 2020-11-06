@@ -1,9 +1,9 @@
 {
   "pages": [
+    "pages/category/index",
     "pages/address-list/index",
     "pages/cart/index", 
     "pages/confirm-order/index",
-    "pages/category/index",
     "pages/vant-test/index",
     "pages/logs/logs",
     "pages/request-login-test/index",
