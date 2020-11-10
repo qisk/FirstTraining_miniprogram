@@ -8,6 +8,21 @@ Page({
    */
   data: {
     selectedAddressId: 0,
+    addressList: [
+    {
+      id: 0,
+      userName: '小王',
+      telNumber: '0',
+      region: ['广东省', '广州市', '海珠区'],
+      detailInfo: '详细地址'
+    }, 
+    {
+      id: 1,
+      userName: '小李',
+      telNumber: '0',
+      region: ['广东省', '广州市', '海珠区'],
+      detailInfo: '详细地址'
+    }]
   },
 
   getAddressFromWeixin(e) {
@@ -16,6 +31,31 @@ Page({
       wx.chooseAddress({
         success: (result) => {
           console.log(result)
+
+          let addressList = this.data.addressList
+          // 判断地址是否重复，如果重复就不添加到地址列表，直接设置改地址选中态
+          let res = addressList.find(item=>item.telNumber == result.telNumber)
+          console.log('res:', res)
+          if (res) {
+            this.setData({
+              selectedAddressId: res.id
+            })
+            return
+          }
+
+          let address = {
+            id: addressList.length,
+            userName: result.userName,
+            telNumber: result.telNumber,
+            region: [result.provinceName, result.cityName, result.countyName],
+            detailInfo: result.detailInfo
+          }
+          addressList.push(address)
+          console.log('addressList[addressList.length - 1]', addressList[addressList.length - 1])
+          this.setData({
+            selectedAddressId: addressList[addressList.length - 1].id,
+            addressList
+          })
         },
       })
     }

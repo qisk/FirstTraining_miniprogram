@@ -1,4 +1,12 @@
-<!--pages/address-list/index.wxml-->
+<wxs module="fn">
+  module.exports = {
+    // 将数组合并为字符串
+    join: function (arr) {
+      return arr.join('')
+    }
+  }
+</wxs>
+
 <van-cell-group>
   <van-cell is-link bind:click="getAddressFromWeixin" title="获取微信收货地址" border="{{ false }}" >
     <van-icon style="padding-right:10px " color="green" slot="icon" name="chat-o" />
@@ -7,18 +15,20 @@
 
 <van-radio-group value="{{ selectedAddressId }}" bind:change="onAddressIdChangge">
   <van-cell-group>
-    <van-cell use-label-slot>
-      <view slot="icon" style="padding-right:10px">
-        <van-radio size="17px" name="1"></van-radio>
-      </view>
-      <view slot="title">
-        姓名：张三
-      </view>
-      <view slot="label">
-        快递地址
-      </view>
-      <van-icon slot="right-icon" name="edit" />
-    </van-cell>
+    <block wx:for="{{addressList}}" wx:key="id">
+      <van-cell use-label-slot>
+        <view slot="icon" style="padding-right:10px">
+          <van-radio size="17px" name="{{item.id}}"></van-radio>
+        </view>
+        <view slot="title">
+          {{item.userName}}, {{item.telNumver}}
+        </view>
+        <view slot="label">
+          收货地址：{{fn.join(item.region)}} {{item.detailInfo}}
+        </view>
+        <van-icon slot="right-icon" name="edit" />
+      </van-cell>
+    </block>
   </van-cell-group>
 </van-radio-group>
 
