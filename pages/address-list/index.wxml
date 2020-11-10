@@ -1,6 +1,6 @@
 <!--pages/address-list/index.wxml-->
 <van-cell-group>
-  <van-cell is-link title="获取微信收货地址" border="{{ false }}" >
+  <van-cell is-link bind:click="getAddressFromWeixin" title="获取微信收货地址" border="{{ false }}" >
     <van-icon style="padding-right:10px " color="green" slot="icon" name="chat-o" />
   </van-cell>
 </van-cell-group>

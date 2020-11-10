@@ -1,7 +1,8 @@
 {
   "pages": [
-    "pages/category/index",
     "pages/address-list/index",
+    "pages/new-address/index",
+    "pages/category/index",
     "pages/cart/index", 
     "pages/confirm-order/index",
     "pages/vant-test/index",
@@ -10,8 +11,7 @@
     "pages/extend-page/index",
     "pages/goods/index",
     "pages/map-setting/index",
-    "pages/map-tracing/index",
-    "pages/new-address/index"
+    "pages/map-tracing/index"
   ],
   "window": {
     "backgroundTextStyle": "light",

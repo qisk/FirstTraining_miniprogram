@@ -10,6 +10,17 @@ Page({
     selectedAddressId: 0,
   },
 
+  getAddressFromWeixin(e) {
+    if (wx.canIUse('chooseAddress.success.userName')) {
+      // 异步接口
+      wx.chooseAddress({
+        success: (result) => {
+          console.log(result)
+        },
+      })
+    }
+  },
+
   onAddressIdChangge(e) {
     let id = e.detail
     this.setData({
