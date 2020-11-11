@@ -21,18 +21,16 @@
           <van-radio size="17px" name="{{item.id}}"></van-radio>
         </view>
         <view slot="title">
-          {{item.userName}}, {{item.telNumver}}
+          {{item.userName}}, {{item.telNumber}}
         </view>
         <view slot="label">
           收货地址：{{fn.join(item.region)}} {{item.detailInfo}}
         </view>
-        <van-icon slot="right-icon" name="edit" />
+        <van-icon data-id="{{item.id}}" bind:click="edit" slot="right-icon" name="edit" />
       </van-cell>
     </block>
   </van-cell-group>
 </van-radio-group>
-
-
 
 <view class="address-btns">
   <van-button bind:click="confirm" type="default" size="large">选择</van-button>

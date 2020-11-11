@@ -7,6 +7,7 @@ Page({
    * 页面的初始数据
    */
   data: {
+    id: 0,
     userName: '',
     telNumber: '',
     region: ['广东省', '广州市', '海珠区'],
@@ -20,16 +21,22 @@ Page({
   },
 
   async save(e) {
+    console.log('this.data:', this.data)
     let data = this.data
+
+    let method = this.data.id ? "put" : "post"
+
     let res = await wxp.request_with_login({
       url: util.ipAddress + '/user/my/address',
-      method: 'post',
+      method: method,
       data
     })
     if (res.data.msg == 'ok') {
       // 发送event channel数据
       let opener = this.getOpenerEventChannel()
-      let address = res.data.data
+      console.log('put res=', res)
+      let address = this.data // 注意：put res返回的是一个数组，第一个元素是1。
+      if (!this.data.id) address.id = res.data.data.id
       opener.emit("savedNewAddress", address)
       wx.navigateBack({
         delta: 1
@@ -59,7 +66,17 @@ Page({
    * 生命周期函数--监听页面显示
    */
   onShow: function () {
-
+    // 设置初始值
+    let opener = this.getOpenerEventChannel()
+    opener.on("editAddress", address=>{
+      this.setData({
+        userName: address.userName,
+        telNumber: address.telNumber,
+        detailInfo: address.detailInfo,
+        region: address.region,
+        id: address.id
+      })
+    })
   },
 
   /**

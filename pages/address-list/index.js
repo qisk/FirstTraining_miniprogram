@@ -63,15 +63,27 @@ Page({
   },
 
   onSavedAddress(address) {
-     console.log(address)
+    console.log(address)
+    let addressList = this.data.addressList
+  
+    let existedAddress = addressList.find(item=>item.id == address.id)
+    if (existedAddress) {
+      // 使用some函数，对数组中的记录进行更新操作
+      addressList.some((item, index)=>{
+        if (item.id == address.id) {
+          addressList[index] = address
+          return true
+        }
+      })
+    } else {
+      // 新增地址记录的处理逻辑
+      addressList.push(address)
+    }
 
-     let addressList = this.data.addressList
-     addressList.push(address)
-
-     this.setData({
-       addressList,
-       selectedAddressId:address.id
-     })
+    this.setData({
+      addressList,
+      selectedAddressId: address.id
+    })
   },
 
   onAddressIdChangge(e) {
@@ -103,6 +115,22 @@ Page({
     })
   },
 
+  edit(e) {
+    console.log(e.currentTarget.dataset.id)
+    let id = e.currentTarget.dataset.id
+    let addressList = this.data.addressList
+    let address = addressList.find(item=>item.id == id)
+    wx.navigateTo({
+      url: '/pages/new-address/index',
+      success: (res)=> {
+        // 将对象发送给目标页面
+        res.eventChannel.emit('editAddress', address)
+        // 监听目标页面回传的信息
+        res.eventChannel.on('savedNewAddress', this.onSavedAddress)
+      }
+    })
+  },
+
   /**
    * 生命周期函数--监听页面加载
    */
@@ -111,6 +139,7 @@ Page({
       url: util.ipAddress + '/user/my/address',
       method: 'get',
     })
+    console.log('onLoad: res.data.data=', res.data.data)
     let addressList = res.data.data
     let selectedAddressId = addressList[0].id
     this.setData({
