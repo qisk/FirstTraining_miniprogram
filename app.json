@@ -1,10 +1,10 @@
 {
   "pages": [
+    "pages/confirm-order/index",
     "pages/address-list/index",
     "pages/new-address/index",
     "pages/category/index",
     "pages/cart/index", 
-    "pages/confirm-order/index",
     "pages/vant-test/index",
     "pages/logs/logs",
     "pages/request-login-test/index",

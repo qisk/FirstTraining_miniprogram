@@ -1,6 +1,10 @@
 /* pages/address-list/index.wxss */
-.new-address {
+.address-btns {
   position: fixed !important;
   width: 100%;
   bottom: 0;
+}
+
+.new-address {
+  margin-top: 30rpx;
 }

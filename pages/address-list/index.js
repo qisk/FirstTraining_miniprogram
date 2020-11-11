@@ -1,6 +1,6 @@
-// test jenkins SCM change
-// test jenkins SCM change for pipeline 
-// pages/address-list/index.js
+const { default: wxp } = require("../../lib/wxp")
+const util = require("../../utils/util.js")
+
 Page({
 
   /**
@@ -8,21 +8,7 @@ Page({
    */
   data: {
     selectedAddressId: 0,
-    addressList: [
-    {
-      id: 0,
-      userName: '小王',
-      telNumber: '0',
-      region: ['广东省', '广州市', '海珠区'],
-      detailInfo: '详细地址'
-    }, 
-    {
-      id: 1,
-      userName: '小李',
-      telNumber: '0',
-      region: ['广东省', '广州市', '海珠区'],
-      detailInfo: '详细地址'
-    }]
+    addressList: []
   },
 
   getAddressFromWeixin(e) {
@@ -85,6 +71,18 @@ Page({
     })
   },
 
+  confirm(e) {
+    let selectedAddressId = this.data.selectedAddressId
+    let addressList = this.data.addressList
+    let item = addressList.find(item=>item.id == selectedAddressId)
+    // 向购物车页面发送数据，数据为选择的地址对象
+    let opener = this.getOpenerEventChannel()
+    opener.emit('selectAddress', item)
+    wx.navigateBack({
+      delta: 1,
+    })
+  },
+
   /**
    * 生命周期函数--监听页面加载
    */
@@ -102,8 +100,17 @@ Page({
   /**
    * 生命周期函数--监听页面显示
    */
-  onShow: function () {
-
+  onShow: async function () {
+    let res = await wxp.request_with_login({
+      url: util.ipAddress + '/user/my/address',
+      method: 'get',
+    })
+    let addressList = res.data.data
+    let selectedAddressId = addressList[0].id
+    this.setData({
+      addressList,
+      selectedAddressId
+    })
   },
 
   /**
