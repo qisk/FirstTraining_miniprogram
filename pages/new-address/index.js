@@ -1,4 +1,6 @@
-// pages/new-address/index.js
+const { default: wxp } = require("../../lib/wxp")
+const util = require("../../utils/util.js")
+
 Page({
 
   /**
@@ -12,7 +14,31 @@ Page({
   },
 
   bindRegionChange(e) {
+    this.setData({
+      region: e.detail.value
+    })
+  },
 
+  async save(e) {
+    let data = this.data
+    let res = await wxp.request_with_login({
+      url: util.ipAddress + '/user/my/address',
+      method: 'post',
+      data
+    })
+    if (res.data.msg == 'ok') {
+      // 发送event channel数据
+      let opener = this.getOpenerEventChannel()
+      let address = res.data.data
+      opener.emit("savedNewAddress", address)
+      wx.navigateBack({
+        delta: 1
+      })
+    } else {
+      wx.showToast({
+        title: '添加失败',
+      })
+    }
   },
 
   /**

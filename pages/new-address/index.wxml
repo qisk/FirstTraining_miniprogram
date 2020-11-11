@@ -19,5 +19,7 @@
 </van-cell-group>
 
 <view style="padding:20px 15px">
-  <van-button type="primary" size="large">保存并使用</van-button>
+  <van-button bind:click="save" type="primary" size="large">保存并使用</van-button>
 </view>
+
+<LoginPanel show="{{showLoginPanel}}"></LoginPanel>

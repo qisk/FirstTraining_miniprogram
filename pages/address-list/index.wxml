@@ -32,4 +32,4 @@
   </van-cell-group>
 </van-radio-group>
 
-<van-button custom-class="new-address" type="primary" size="large">新增收货地址</van-button>
+<van-button bind:click="navigateToNewAddressPage"custom-class="new-address" type="primary" size="large">新增收货地址</van-button>

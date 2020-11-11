@@ -50,15 +50,22 @@ Page({
             region: [result.provinceName, result.cityName, result.countyName],
             detailInfo: result.detailInfo
           }
-          addressList.push(address)
-          console.log('addressList[addressList.length - 1]', addressList[addressList.length - 1])
-          this.setData({
-            selectedAddressId: addressList[addressList.length - 1].id,
-            addressList
-          })
+          this.onSavedAddress(address)
         },
       })
     }
+  },
+
+  onSavedAddress(address) {
+     console.log(address)
+
+     let addressList = this.data.addressList
+     addressList.push(address)
+
+     this.setData({
+       addressList,
+       selectedAddressId:address.id
+     })
   },
 
   onAddressIdChangge(e) {
@@ -68,6 +75,16 @@ Page({
     })
   },
   
+  navigateToNewAddressPage(e) {
+    wx.navigateTo({
+      url: '/pages/new-address/index',
+      success: (res)=>{ 
+        // 从新增地址页面，获取新的收货地址
+        res.eventChannel.on("savedNewAddress", this.onSavedAddress)
+      }
+    })
+  },
+
   /**
    * 生命周期函数--监听页面加载
    */
