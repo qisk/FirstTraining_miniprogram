@@ -15,7 +15,7 @@ Page({
     if (wx.canIUse('chooseAddress.success.userName')) {
       // 异步接口
       wx.chooseAddress({
-        success: (result) => {
+        success: async (result) => {
           console.log(result)
 
           let addressList = this.data.addressList
@@ -29,14 +29,34 @@ Page({
             return
           }
 
+          console.log('send request, insert new address to database')
+          // 会自动生成一个id
           let address = {
-            id: addressList.length,
             userName: result.userName,
             telNumber: result.telNumber,
             region: [result.provinceName, result.cityName, result.countyName],
             detailInfo: result.detailInfo
           }
-          this.onSavedAddress(address)
+
+          let res_request = await wxp.request_with_login({
+            url: util.ipAddress + '/user/my/address',
+            method: 'post',
+            data: address
+          })
+
+          console.log(res_request)
+          if (res_request.data.msg == 'ok') {
+            let item = res_request.data.data
+            addressList.push(item)
+            this.setData({
+              addressList,
+              selectedAddressId: item.id
+            })
+          } else {
+            wx.showToast({
+              title: '添加地址失败',
+            })
+          }
         },
       })
     }
@@ -86,8 +106,17 @@ Page({
   /**
    * 生命周期函数--监听页面加载
    */
-  onLoad: function (options) {
-
+  onLoad: async function (options) {
+    let res = await wxp.request_with_login({
+      url: util.ipAddress + '/user/my/address',
+      method: 'get',
+    })
+    let addressList = res.data.data
+    let selectedAddressId = addressList[0].id
+    this.setData({
+      addressList,
+      selectedAddressId
+    })
   },
 
   /**
@@ -100,17 +129,7 @@ Page({
   /**
    * 生命周期函数--监听页面显示
    */
-  onShow: async function () {
-    let res = await wxp.request_with_login({
-      url: util.ipAddress + '/user/my/address',
-      method: 'get',
-    })
-    let addressList = res.data.data
-    let selectedAddressId = addressList[0].id
-    this.setData({
-      addressList,
-      selectedAddressId
-    })
+  onShow: function () {
   },
 
   /**
