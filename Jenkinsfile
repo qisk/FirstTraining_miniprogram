@@ -9,20 +9,30 @@ pipeline {
         stage('getCommitMessage') {
             steps {
                 script {
-                  echo "BRANCH_NAME=${BRANCH_NAME}"
+                    echo "BRANCH_NAME=${BRANCH_NAME}"
 
-                  def commit_message = getCommitMessage()
-                  echo "commit_message=${commit_message}"
+                    def commit_message = getCommitMessage()
+                    echo "commit_message=${commit_message}"
 
-                  def commitIdAndAuthor = getCommitIdAndAuthor()
-                  echo "commitIdAndAuthor=${commitIdAndAuthor}"
-                  currentBuild.displayName = "${commitIdAndAuthor}"
+                    def commitIdAndAuthor = getCommitIdAndAuthor()
+                    echo "commitIdAndAuthor=${commitIdAndAuthor}"
+                    currentBuild.displayName = "${commitIdAndAuthor}"
                 }
             }
         }
         stage('Build') {
             steps {
-                echo 'Building..'
+                script { 
+                    echo 'Building..'
+                    fileOperations([
+                        folderCreateOperation('./commitBuildPool/${currentBuild.displayName}'), 
+                        folderCopyOperation(destinationFolderPath: './commitBuildPool/${currentBuild.displayName}', sourceFolderPath: '.')
+                    ])
+                    dir('./commitBuildPool/${currentBuild.displayName}/ci') {
+                      sh 'pwd'
+                      sh 'node miniprogram_upload.js'
+                    }
+                }
             }
         }
         stage('Test') {
