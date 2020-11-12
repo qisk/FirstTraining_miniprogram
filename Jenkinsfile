@@ -24,7 +24,7 @@ pipeline {
             steps {
                 script { 
                     echo 'Building..'
-                    def newCommitDir = currentBuild.displayName..substring(0, 7)
+                    def newCommitDir = currentBuild.displayName.substring(0, 7)
                     fileOperations([
                         folderCreateOperation("./commitBuildPool/${newCommitDir}"), 
                         folderCopyOperation(destinationFolderPath: "./commitBuildPool/${newCommitDir}", sourceFolderPath: '.')
