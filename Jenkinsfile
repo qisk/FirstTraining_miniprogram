@@ -25,10 +25,10 @@ pipeline {
                 script { 
                     echo 'Building..'
                     fileOperations([
-                        folderCreateOperation('./commitBuildPool/${currentBuild.displayName}'), 
-                        folderCopyOperation(destinationFolderPath: './commitBuildPool/${currentBuild.displayName}', sourceFolderPath: '.')
+                        folderCreateOperation("./commitBuildPool/${currentBuild.displayName}"), 
+                        folderCopyOperation(destinationFolderPath: "./commitBuildPool/${currentBuild.displayName}", sourceFolderPath: '.')
                     ])
-                    dir('./commitBuildPool/${currentBuild.displayName}/ci') {
+                    dir("./commitBuildPool/${currentBuild.displayName}/ci") {
                       sh 'pwd'
                       sh 'node miniprogram_upload.js'
                     }
