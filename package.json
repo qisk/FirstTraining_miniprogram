@@ -1,7 +1,7 @@
 {
   "name": "miniprogram",
-  "version": "V1.1.2",
-  "description": "商城项目实战",
+  "version": "V1.1.3_ci",
+  "description": "商城项目实战_支持ci自动上传",
   "main": "app.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
