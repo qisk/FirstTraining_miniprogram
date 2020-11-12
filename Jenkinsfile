@@ -24,11 +24,12 @@ pipeline {
             steps {
                 script { 
                     echo 'Building..'
+                    def newCommitDir = currentBuild.displayName..substring(0, 7)
                     fileOperations([
-                        folderCreateOperation("./commitBuildPool/${currentBuild.displayName}"), 
-                        folderCopyOperation(destinationFolderPath: "./commitBuildPool/${currentBuild.displayName}", sourceFolderPath: '.')
+                        folderCreateOperation("./commitBuildPool/${newCommitDir}"), 
+                        folderCopyOperation(destinationFolderPath: "./commitBuildPool/${newCommitDir}", sourceFolderPath: '.')
                     ])
-                    dir("./commitBuildPool/${currentBuild.displayName}/ci") {
+                    dir("./commitBuildPool/${newCommitDir}/ci") {
                       sh 'pwd'
                       sh 'node miniprogram_upload.js'
                     }
