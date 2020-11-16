@@ -54,7 +54,7 @@ pipeline {
             steps {
                 script {
                     echo 'Quality Gate..'
-                    timeout(time:5, unit:'MINUTES') {
+                    timeout(time:1, unit:'MINUTES') {
                         //这里设置超时时间5分钟，如果Sonar Webhook失败，不会出现一直卡在检查状态
                         //利用Sonar webhook功能通知pipeline代码检测结果，未通过质量阈，pipeline将会fail
                         //注意：这里waitForQualityGate()中的参数也要与之前SonarQube servers中Name的配置相同
