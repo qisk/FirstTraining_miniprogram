@@ -6,9 +6,10 @@ pipeline {
 			}
 
     stages {
-        stage('getCommitMessage') {
+        stage('Source') {
             steps {
                 script {
+                    echo 'Source..'
                     echo "BRANCH_NAME=${BRANCH_NAME}"
 
                     def commit_message = getCommitMessage()
@@ -20,10 +21,11 @@ pipeline {
                 }
             }
         }
-        stage('Build') {
+        /*
+        stage('Compile') {
             steps {
                 script { 
-                    echo 'Building..'
+                    echo 'Compile..'
                     def newCommitDir = JOB_NAME.replace("/", "-") + '/' + currentBuild.displayName.substring(0, 7)
                     fileOperations([
                         folderCreateOperation("../commitBuildPool/${newCommitDir}"), 
@@ -36,9 +38,21 @@ pipeline {
                 }
             }
         }
-        stage('Test') {
+        */
+        stage('Analysis') {
             steps {
-                echo 'Testing..'
+                script {
+                    echo 'Analysis..'
+                    def scannerLoc = tool 'sq-scanner'
+                    withSonarQubeEnv('Local_SonarQube') {
+                        sh "${scannerLoc}/bin/sonar-scanner"
+                    }
+                }
+            }
+        }
+        stage('Quality Gate') {
+            steps {
+                echo 'Quality Gate..'
             }
         }
         stage('Deploy') {
