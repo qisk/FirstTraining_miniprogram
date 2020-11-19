@@ -8,7 +8,11 @@ Page({
    */
   data: {
     selectedAddressId: 0,
-    addressList: []
+    addressList: [],
+    slideButtons: [{
+      type: 'warn',
+      text: '删除'   
+    }]
   },
 
   getAddressFromWeixin(e) {
@@ -118,7 +122,7 @@ Page({
   edit(e) {
     console.log(e.currentTarget.dataset.id)
     let id = e.currentTarget.dataset.id
-    let addressList = this.data.addressList
+    let addressList = this.data.addressList 
     let address = addressList.find(item=>item.id == id)
     wx.navigateTo({
       url: '/pages/new-address/index',
@@ -129,6 +133,30 @@ Page({
         res.eventChannel.on('savedNewAddress', this.onSavedAddress)
       }
     })
+  },
+
+  async onSlideButtonTap(e) {
+    let id = e.currentTarget.dataset.id
+    console.log('slide button tap', e.detail, id)
+
+    let res = await wxp.request_with_login({
+      url: util.ipAddress + `/user/my/address/${id}`,
+      method: 'delete',
+    })
+    console.log(res)
+    if (res && res.data.msg == 'ok') {
+      // 刷新页面数据，去除删除的记录
+      let addressList = this.data.addressList
+      for (let i=0; i<addressList.length; i++) {
+        if (addressList[i].id == id) {
+          addressList.splice(i, 1)
+          break
+        }
+      }
+      this.setData({
+        addressList
+      })
+    }
   },
 
   /**
