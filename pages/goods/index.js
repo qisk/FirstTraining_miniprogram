@@ -123,6 +123,15 @@ Page({
      selectedGoodsSkuObject.text = ''
      for (let j=0; j<goodsSkuData.goodsAttrKeys.length;j++) {
        let item = goodsSkuData.goodsAttrKeys[j]
+
+       // 如果只选择一个规格，this.data.selectedAttrValue[item.attr_name]就会为null导致程序出错
+       if (!this.data.selectedAttrValue[item.attr_name]) {
+         wx.showModal({
+           title: '没有选择全部规格',
+           showCancel:false
+         })
+         return
+       }
        selectedGoodsSkuObject.text += this.data.selectedAttrValue[item.attr_name].attr_value + ' '
      }
      this.setData({
@@ -137,6 +146,7 @@ Page({
         title: '请选择商品规格',
         showCancel: false
       })
+      this.showSkuPanelPopup()
       return
     }
     let goods_id = this.data.goodsId
