@@ -92,6 +92,7 @@ module.exports =
 
 "use strict";
 
+
 Component({
     options: {
         addGlobalClass: true,
@@ -121,7 +122,6 @@ Component({
             this.scrollTabBar(_activeTab);
         }
     },
-
     relations: {
         '../vtabs-content/index': {
             type: 'child',
