@@ -156,6 +156,11 @@ Page({
       this.setData({
         addressList
       })
+    } else {
+      wx.showModal({
+        title: "提示",
+        content: "删除地址失败"
+      });
     }
   },
 
@@ -167,13 +172,21 @@ Page({
       url: util.ipAddress + '/user/my/address',
       method: 'get',
     })
-    console.log('onLoad: res.data.data=', res.data.data)
-    let addressList = res.data.data
-    let selectedAddressId = addressList[0].id
-    this.setData({
-      addressList,
-      selectedAddressId
-    })
+    //console.log('onLoad: res=', res)
+    //console.log('onLoad: res.data.data=', res.data.data)
+    //console.log(JSON.stringify(res.data.data))
+    if (res && res.data.msg == 'ok') {
+      let addressList = res.data.data
+      let selectedAddressId = addressList[0].id
+      this.setData({
+        addressList,
+        selectedAddressId
+      })
+    } else {
+      wx.showToast({
+        title: '地址列表获取错误',
+      })
+    }
   },
 
   /**
