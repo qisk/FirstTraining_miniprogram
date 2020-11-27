@@ -17,6 +17,9 @@ module.exports = {
   ],
   testEnvironment: 'node',
 
+  // 使用jest-sonar-reporter生成sonarQube可识别的测试结果
+  testResultsProcessor: "jest-sonar-reporter",
+
   //automock: true,
 
   //transformIgnorePatterns: ["./node_modules/(?!(lodash-es|other-es-lib))"]
