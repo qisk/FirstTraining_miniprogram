@@ -38,17 +38,35 @@ pipeline {
             }
         }
         
-        stage('Analysis') {
+        stage('Unit Test') {
             steps {
                 script {
-                    echo 'Analysis..'
-                    def scannerLoc = tool 'sq-scanner'
-                    withSonarQubeEnv('Local_SonarQube') {
-                        sh "${scannerLoc}/bin/sonar-scanner"
+                    echo 'Unit Test'
+                    def newCommitDir = JOB_NAME.replace("/", "-") + '/' + currentBuild.displayName.substring(0, 7)
+                    dir("../commitBuildPool/${newCommitDir}") {
+                      sh 'pwd'
+                      sh 'jest'
+                      sh 'ls coverage -al'
                     }
                 }
             }
         }
+
+        stage('Analysis') {
+            steps {
+                script {
+                    echo 'Analysis..'
+                    def newCommitDir = JOB_NAME.replace("/", "-") + '/' + currentBuild.displayName.substring(0, 7)
+                    dir("../commitBuildPool/${newCommitDir}") {
+                        def scannerLoc = tool 'sq-scanner'
+                        withSonarQubeEnv('Local_SonarQube') {
+                            sh "${scannerLoc}/bin/sonar-scanner"
+                        }
+                    }
+                }
+            }
+        }
+
         stage('Quality Gate') {
             steps {
                 script {
