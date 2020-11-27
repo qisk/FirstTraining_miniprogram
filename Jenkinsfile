@@ -20,7 +20,7 @@ pipeline {
                 }
             }
         }
-        /*
+        
         stage('Compile') {
             steps {
                 script { 
@@ -37,7 +37,7 @@ pipeline {
                 }
             }
         }
-        */
+        
         stage('Analysis') {
             steps {
                 script {
