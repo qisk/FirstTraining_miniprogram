@@ -47,6 +47,7 @@ pipeline {
                       sh 'pwd'
                       sh 'jest'
                       sh 'ls coverage -al'
+                      junit 'test-report.xml'
                     }
                 }
             }
@@ -84,6 +85,7 @@ pipeline {
                 }
             }
         }
+        
         stage('Deploy') {
             steps {
                 echo 'Deploying..'
