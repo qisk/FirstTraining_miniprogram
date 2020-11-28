@@ -15,4 +15,4 @@ node_modules/
 
 # code coverage
 coverage/
-test-report.xml
+*report.xml
