@@ -47,7 +47,7 @@ pipeline {
                       sh 'pwd'
                       sh 'jest'
                       sh 'ls coverage -al'
-                      junit 'test-report.xml'
+                      junit 'report.xml'
                     }
                 }
             }
