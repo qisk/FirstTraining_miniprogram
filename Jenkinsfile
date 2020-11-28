@@ -44,10 +44,14 @@ pipeline {
                     echo 'Unit Test'
                     def newCommitDir = JOB_NAME.replace("/", "-") + '/' + currentBuild.displayName.substring(0, 7)
                     dir("../commitBuildPool/${newCommitDir}") {
-                      sh 'pwd'
-                      sh 'jest'
-                      sh 'ls coverage -al'
-                      junit 'report.xml'
+                        sh 'pwd'
+                        // 这里需要截获jest命令的返回值，否则只要有测试例运行错误，来不及运行junit，就会导致构建失败。
+                        def res = sh returnStatus: true, script: 'jest'
+                        sh 'ls coverage -al'
+                        junit 'report.xml'
+
+                        // 在这里检测jest结果，如果有测试例运行失败则构建失败
+                        if (res != 0) error 'unit test failed'
                     }
                 }
             }
