@@ -71,7 +71,7 @@ describe('收货地址设置页面', () => {
           title: "提示",
           content: "删除地址失败"
       })
-      expect(page.data.addressList.length).toBe(4);
+      expect(page.data.addressList.length).toBe(3);
     });
   });
 
