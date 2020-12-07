@@ -10,7 +10,7 @@ const project = new ci.Project({
   })
   
   ci.preview({
-    project,
+    project, 
     desc: 'dev preview', // 此备注将显示在“小程序助手”（是一个官方微信小程序），版本查看——开发版列表中
     setting: {
       es6: true,
