@@ -32,7 +32,7 @@ pipeline {
                     ])
                     dir("../commitBuildPool/${newCommitDir}/ci") {
                       sh 'pwd'
-                      sh 'node miniprogram_upload.js'
+                      sh 'node miniprogram_preview.js'
                     }
                 }
             }
