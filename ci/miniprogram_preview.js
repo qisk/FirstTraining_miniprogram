@@ -18,7 +18,7 @@ const project = new ci.Project({
       autoPrefixWXSS: true,
     },
     qrcodeFormat: 'image',
-    qrcodeOutputDest: process.cwd() + '/qrcode/file/destination.jpg',
+    qrcodeOutputDest: process.cwd() + 'previewQRcode.jpg',
     onProgressUpdate: console.log,
     // pagePath: 'pages/index/index', // 预览页面
     // searchQuery: 'a=1&b=2',  // 预览参数 [注意!]这里的`&`字符在命令行中应写成转义字符`\&`
