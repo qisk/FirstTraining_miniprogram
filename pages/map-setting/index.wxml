@@ -22,7 +22,7 @@
           <van-button plain bindtap="includePoints" type="info">缩放视野</van-button>
         </van-col>
         <van-col span="7" offset="1">
-          <van-button plain disabled="true" bindtap="uploadStorageData" type="info">上传数据</van-button>
+          <van-button plain bindtap="uploadStorageData" type="info">上传数据</van-button>
         </van-col>
       </van-row>
     </van-cell>

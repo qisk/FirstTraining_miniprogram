@@ -1,5 +1,7 @@
 {
   "pages": [
+    "pages/map-setting/index",
+    "pages/map-tracing/index",
     "pages/category/index",
     "pages/address-list/index",
     "pages/cart/index",
@@ -9,9 +11,7 @@
     "pages/logs/logs",
     "pages/request-login-test/index",
     "pages/extend-page/index",
-    "pages/goods/index",
-    "pages/map-setting/index",
-    "pages/map-tracing/index"
+    "pages/goods/index"
   ],
   "window": {
     "backgroundTextStyle": "light",

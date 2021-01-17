@@ -487,9 +487,20 @@ Page({
     }
     */
 
+    /*
     // 将storage中的轨迹数据发送到服务端
     let positive_info = JSON.stringify(wx.getStorageSync('positive_polyline_points'))
     let opposite_info = JSON.stringify(wx.getStorageSync('opposite_polyline_points'))
+
+    let data = {
+      positive_info,
+      opposite_info,
+    }
+    */
+
+    // 将storage中的站点数据发送到服务端
+    let positive_info = wx.getStorageSync('stations_positive_info')
+    let opposite_info = wx.getStorageSync('stations_opposite_info')
 
     let data = {
       positive_info,
