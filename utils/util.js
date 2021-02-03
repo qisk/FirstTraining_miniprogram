@@ -75,8 +75,10 @@ const compareVersion = (v1, v2) => {
 // 判断到站的距离（40米）
 const arrive_distance = 40
 
-// 花轨迹线时两点间的距离（50米）
-const polyline_point_distance = 20
+// 花轨迹线时相邻两点间的最小距离（20米）
+const polyline_minimum_point_distance = 20
+// 花轨迹线时相邻两点间的最大距离（200米）
+const polyline_maximum_point_distance = 200
 
 // 注意：需要导出后才能正常使用常量和函数
 module.exports = {
@@ -84,7 +86,7 @@ module.exports = {
   ipAddress: ipAddress,
   getMapDistance: getMapDistance,
   arrive_distance: arrive_distance,
-  polyline_point_distance: polyline_point_distance,
+  polyline_minimum_point_distance,polyline_maximum_point_distance,
   compareVersion: compareVersion,
   getIpAddress: getIpAddress
 }

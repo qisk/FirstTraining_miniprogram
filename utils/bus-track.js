@@ -3,8 +3,8 @@ const stations_positive_info = [
   {
       "id": 0,
       "name": "东渡",
-      "latitude": "24.503822157118055",
-      "longitude": "118.15492431640625"
+      "latitude": "24.483059895833332",
+      "longitude": "118.07940131293402"
   },
   {
       "id": 1,
@@ -39,8 +39,8 @@ const stations_positive_info = [
   {
       "id": 6,
       "name": "武警支队",
-      "latitude": "24.498316514756944",
-      "longitude": "118.12578965928819"
+      "latitude": "24.497569986979165",
+      "longitude": "118.12429280598958"
   },
   {
       "id": 7,

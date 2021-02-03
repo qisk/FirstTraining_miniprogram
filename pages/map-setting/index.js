@@ -227,15 +227,17 @@ Page({
             initFlg: true
           })
         } else {
-          // 判断当前点和上一个位置点的距离，大于50米就添加到polyline中
+          // 判断当前点和上一个位置点的距离，大于20米，小于200米，就添加到polyline中（小于200米是为了防止定位点漂移）
           const distance = util.getMapDistance(that.data.previous_polyline_point.latitude, that.data.previous_polyline_point.longitude, latitude, longitude)
 
           console.log('distance:', distance)
+          console.log('polyline_minimum_point_distance:', util.polyline_minimum_point_distance)
+          console.log('polyline_maximum_point_distance:', util.polyline_maximum_point_distance)
           that.setData({
             polyline_point_distance: distance
           })
 
-          if (distance > util.polyline_point_distance) {
+          if ((distance > util.polyline_minimum_point_distance) && (distance < util.polyline_maximum_point_distance)) {
             console.log('add position to')
             that.setPolyline({
               latitude: latitude,

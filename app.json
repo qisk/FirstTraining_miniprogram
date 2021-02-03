@@ -16,7 +16,7 @@
   "window": {
     "backgroundTextStyle": "light",
     "navigationBarBackgroundColor": "#fff",
-    "navigationBarTitleText": "采集站点位置及班车轨迹",
+    "navigationBarTitleText": "站点采集器V1.0.4",
     "navigationBarTextStyle": "black"
   },
   "sitemapLocation": "sitemap.json",
