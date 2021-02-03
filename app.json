@@ -16,7 +16,7 @@
   "window": {
     "backgroundTextStyle": "light",
     "navigationBarBackgroundColor": "#fff",
-    "navigationBarTitleText": "商城项目实战",
+    "navigationBarTitleText": "采集站点位置及班车轨迹",
     "navigationBarTextStyle": "black"
   },
   "sitemapLocation": "sitemap.json",
