@@ -20,7 +20,7 @@ const getIpAddress = ()=> {
 
 //const ipAddress = "http://localhost:3000"         // 服务端本地URL
 //const ipAddress = "http://192.168.31.115:3000"    // 服务端Wi-Fi局域网URL
-const ipAddress = "https://31ba59a28aec.ngrok.io"  // ngrok互联网URL
+const ipAddress = "https://a0bf96f4105f.ngrok.io"  // ngrok互联网URL
 
 //进行经纬度转换为距离的计算
 function Rad(d){

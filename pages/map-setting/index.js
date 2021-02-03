@@ -461,6 +461,7 @@ Page({
   },
 
   uploadStorageData: async function () {
+    /*
     // 在本地用户文件目录下创建一个文件 hello.txt，写入内容 "hello, world"
     const fs = wx.getFileSystemManager()
     console.log('wx.env.USER_DATA_PATH', wx.env.USER_DATA_PATH)
@@ -475,7 +476,7 @@ Page({
         console.log('fail res:', res)
       },
     })
-
+    */
     /*
     // 将storage中的站点数据发送到服务端
     let positive_info = wx.getStorageSync('stations_positive_info')
