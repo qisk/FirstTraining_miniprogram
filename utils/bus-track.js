@@ -27,8 +27,8 @@ const stations_positive_info = [
   {
       "id": 4,
       "name": "文化宫",
-      "latitude": "24.49268825954861",
-      "longitude": "118.11214952256944"
+      "latitude": "24.49263644748264",
+      "longitude": "118.11213270399305"
   },
   {
       "id": 5,
@@ -51,8 +51,8 @@ const stations_positive_info = [
   {
       "id": 8,
       "name": "湖边花园北",
-      "latitude": "24.505176866319445",
-      "longitude": "118.1736105685764"
+      "latitude": "24.505228135850693",
+      "longitude": "118.17347791883681"
   },
   {
       "id": 9,
