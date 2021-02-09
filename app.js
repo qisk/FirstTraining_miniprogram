@@ -11,7 +11,7 @@ App({
 
   globalData: {
     userInfo: null,
-    demoFlg: true, // 是否为演示版本
+    demoFlg: false, // 是否为演示版本
   },
 
   onLaunch: function () {
